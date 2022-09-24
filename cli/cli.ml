@@ -6,5 +6,7 @@ let () =
     Format.eprintf "%s\n" s
   | Lex.Error.InvalidSyntax s ->
     Format.eprintf "%s\n" s
+  | Lex.Error.InvalidType s ->
+    Format.eprintf "%s\n" s
   | Lex.Error.InvalidFname s ->
     Format.eprintf "%s\n" s

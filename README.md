@@ -72,3 +72,11 @@ for true {
   }
 }
 ```
+
+# TODO
+
+- [ ] Parse code to tokens from multiple sources (files, strings)
+- [ ] Test the lex library
+- [ ] Continue the type check
+- [ ] LLVM Compiler
+- [ ] Cli
