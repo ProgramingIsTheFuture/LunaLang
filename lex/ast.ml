@@ -4,10 +4,9 @@ type value =
   | VBool of bool
 
 type typ =
-  | TInt
-  | TString
-  | TEmpty
   | TInference
+  | TVal of string
+  | TFun of string * typ
 
 type param =
   | PTyp of (string * typ)
@@ -15,9 +14,10 @@ type param =
 
 type expr =
   | Const of value
-  | Let of (string * typ * value)
-  | Fun of (string * typ * param * expr)
-  | AnFun of (param * expr)
+  | Var of string
+  | Let of (string * typ * expr)
+  | Fun of (string * typ * param list * expr)
+  | AnFun of (param list * expr)
   | If of (expr * expr)
   | For of (value * value * expr)
   | Loop of (expr * expr)

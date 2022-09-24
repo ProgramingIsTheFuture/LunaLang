@@ -23,4 +23,4 @@ let parse fname =
   with
   | Parser.Error ->
     let pos = Lexing.lexeme_start_p buf in
-    raise (Error.InvalidSyntax (Format.sprintf "File: %s, Line: %d, Character: %d-%d" (pos.pos_fname) pos.pos_lnum (pos.pos_cnum - pos.pos_bol) (pos.pos_cnum - pos.pos_bol + 1)))
+    raise (Error.InvalidSyntax (Format.sprintf "Invalid syntax: File: %s, Line: %d, Character: %d-%d" (pos.pos_fname) pos.pos_lnum (pos.pos_cnum - pos.pos_bol) (pos.pos_cnum - pos.pos_bol + 1)))
