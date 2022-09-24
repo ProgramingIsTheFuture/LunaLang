@@ -1,3 +1,4 @@
 (library
- (name Compiler)
+ (public_name Compiler)
+ (name compiler)
  (libraries llvm))
