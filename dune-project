@@ -13,11 +13,17 @@
 
 (maintainers "ProgramingIsTheFuture")
 
-(license LICENSE)
-
-(documentation https://url/to/documentation)
-
 (package
  (name Cli)
  (synopsis "Compiler cli")
+ (depends ocaml dune))
+
+(package
+ (name Compiler)
+ (synopsis "Compiler library")
  (depends ocaml dune llvm))
+
+(package
+ (name Lex)
+ (synopsis "Lexer library")
+ (depends ocaml dune))
