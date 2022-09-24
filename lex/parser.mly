@@ -3,6 +3,9 @@
 %}
 
 %token <Ast.value> VALUE
+
+%token LET FOR IF ELSE RBRACE LBRACE RPARENT LPARENT BREAK
+%token DOUBLEDOT SEMICOLON EQUAL ARROW
 %token EOF
 
 %start code
