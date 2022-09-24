@@ -1,1 +1,7 @@
-10
+let a: int = 10;
+let a: string = "Hello";
+let sum a: int -> int = a;
+let sum a b = b;
+
+let sum (a: int) (b: int): int -> int -> int = b;
+a
