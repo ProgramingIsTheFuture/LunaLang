@@ -22,14 +22,28 @@ expr:
   | v = variable { v }
   | f = func { f }
 
+vtyp:
+  | n1 = NAME
+    {
+      match n1 with
+      | "int" -> TInt
+      | "string" -> TString
+      | "bool" -> TBool
+      | _ -> raise (Error.InvalidType (Format.sprintf "Invalid type: %s\n" n1))
+    }
+
+funtyp:
+  | t1 = separated_list(RARROW,vtyp)
+    { FTFun (t1) }
+
 typ:
-  | n1 = NAME?
+  | f = funtyp
+    { TFTyp f }
+  | n1 = vtyp?
     { match n1 with
-      | Some v -> TVal v
+      | Some v -> TTyp v
       | None -> TInference
     }
-  | n1 = NAME RARROW t = typ
-    { TFun (n1, t) }
 
 variable:
   | LET n = NAME EQUAL e = expr SEMICOLON

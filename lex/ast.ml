@@ -3,10 +3,18 @@ type value =
   | VString of string
   | VBool of bool
 
+type vtyp =
+  | TInt
+  | TString
+  | TBool
+
+type ftyp =
+  | FTFun of vtyp list
+
 type typ =
+  | TTyp of vtyp
+  | TFTyp of ftyp
   | TInference
-  | TVal of string
-  | TFun of string * typ
 
 type param =
   | PTyp of (string * typ)
@@ -20,7 +28,7 @@ type expr =
   | AnFun of (param list * expr)
   | If of (expr * expr)
   | For of (value * value * expr)
-  | Loop of (expr * expr)
+  | Loop
   | Block of expr list
 
 type code = expr list

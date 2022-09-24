@@ -19,7 +19,7 @@ let parse fname =
   set_filename fname buf;
 
   try
-    Parser.code Lexer.token buf
+    Parser.code Lexer.token buf |> Typing.check_types
   with
   | Parser.Error ->
     let pos = Lexing.lexeme_start_p buf in
