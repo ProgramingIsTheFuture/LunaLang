@@ -26,6 +26,7 @@ type expr =
   | Let of (string * typ * expr)
   | Fun of (string * typ * param list * expr)
   | AnFun of (param list * expr)
+  | Apply of (string * expr list)
   | If of (expr * expr)
   | For of (value * value * expr)
   | Loop

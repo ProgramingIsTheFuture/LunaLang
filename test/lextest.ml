@@ -1,5 +1,6 @@
 let basic_variables () =
-  let code = "let a = 10; let b = \"Hello World\"; let c = false; a" in
+  let code =
+    "let a = 10;\nlet b = \"Hello World\";\nlet c = false;\na" in
   let t = Lex.parse ~code () in
 
   let open Lex__Ast in
@@ -39,7 +40,19 @@ let invalid_types () =
   | Lex.Error.InvalidType _ ->
     assert true;;
 
+let apply_fun_types () =
+  (* First input is a string and a int? = Type error *)
+  let code =
+    "let sum a: string -> int = 10;\nsum \"Hello World\" " in
+  let t = Lex.parse ~code () in
+
+  let open Lex__Ast in
+  let exp = Fun ("sum", TFTyp (FTFun (TString :: TInt :: [])), PTyp ("a", TTyp TString) :: [], Const (VInt 10))
+            :: Apply ("sum", Const (VString "\"Hello World\"") :: [])
+            :: [] in
+  assert (exp = t);;
+
 let () =
-  [basic_variables; complex_inference; complex_types; invalid_types;]
+  [basic_variables; complex_inference; complex_types; invalid_types; apply_fun_types;]
   |> List.map (fun f -> f ())
   |> ignore;;
