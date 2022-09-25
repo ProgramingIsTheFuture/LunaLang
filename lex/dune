@@ -5,5 +5,5 @@
  (modules parser))
 
 (library
- (name Lex)
- (package Lex))
+ (name lex)
+ (package lex))

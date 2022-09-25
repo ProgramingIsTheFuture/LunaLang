@@ -1,5 +1,5 @@
 (executable
- (public_name Cli)
+ (public_name cli)
  (name cli)
- (package Cli)
- (libraries Lex Compiler))
+ (package cli)
+ (libraries lex compiler))
