@@ -1,3 +1,3 @@
 module Error = Error
 
-val parse: string -> Ast.code
+val parse: ?fname:string -> ?code:string -> unit -> Ast.code

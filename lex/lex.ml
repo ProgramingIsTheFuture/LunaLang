@@ -6,16 +6,23 @@ let set_filename fname lexbuf =
                                 Lexing.pos_fname = fname;
                               };;
 
-let parse fname =
-  let f =
-    try
-      open_in fname
-    with
-    | Sys_error s ->
-      raise (Error.InvalidFname s)
+let parse ?(fname="") ?(code="") () =
+  let buf = if fname <> "" then
+      let f =
+        try
+          open_in fname
+        with
+        | Sys_error s ->
+          raise (Error.InvalidFname s)
+      in
+
+      Lexing.from_channel f
+    else if code <> "" then
+      Lexing.from_string code
+    else
+      raise (Error.InvalidParseParams "Both file name and code string are empty")
   in
 
-  let buf = Lexing.from_channel f in
   set_filename fname buf;
 
   try
