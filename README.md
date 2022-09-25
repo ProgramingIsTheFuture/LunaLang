@@ -24,13 +24,21 @@ let a = 10;
 ## Named Functions
 
 ```Dyri
+let print (x: int): int = println x;
+
+let sum (x: int): int -> int = x + 1;
 let sum x = x + 1;
+
+sum a;
+sum 10;
 ```
 
 ## Anonymous Functions
 
 ```Dyri
-let sum = x -> x + 1;
+// Anonymous
+x: int -> x + 1;
+let sum: int -> int = x: int -> x + 1;
 ```
 
 ## Blocks
