@@ -27,6 +27,7 @@ let a = 10;
 let print (x: int): int = println x;
 
 let sum (x: int): int -> int = x + 1;
+
 let sum x = x + 1;
 
 sum a;
@@ -79,3 +80,11 @@ for true {
   }
 }
 ```
+
+# TODO
+
+- [x] Parse code to tokens from multiple sources (files, strings)
+- [ ] Test the lex library
+- [ ] Continue the type check
+- [ ] LLVM Compiler
+- [ ] Cli

@@ -1,2 +1,3 @@
-(test
- (name Dyri))
+(tests
+ (names Dyri lextest)
+ (libraries lex))
