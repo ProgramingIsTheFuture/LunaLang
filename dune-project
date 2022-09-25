@@ -14,16 +14,16 @@
 (maintainers "ProgramingIsTheFuture")
 
 (package
- (name Cli)
+ (name cli)
  (synopsis "Compiler cli")
  (depends ocaml dune))
 
 (package
- (name Compiler)
+ (name compiler)
  (synopsis "Compiler library")
  (depends ocaml dune llvm))
 
 (package
- (name Lex)
+ (name lex)
  (synopsis "Lexer library")
  (depends ocaml dune))
