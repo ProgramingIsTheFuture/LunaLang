@@ -17,10 +17,17 @@
 code: c = list(expr) EOF { c }
 
 expr:
+  | LPARENT e = expr RPARENT { e }
   | v = VALUE { Const v }
-  | n = NAME { Var n }
-  | v = variable { v }
-  | f = func { f }
+  | n = NAME e = list(expr)
+    {
+      match e with
+      | [] -> Var n
+      | l ->
+        Apply (n, l)
+    }
+  | v = variable SEMICOLON { v }
+  | f = func SEMICOLON { f }
 
 vtyp:
   | n1 = NAME
@@ -32,12 +39,12 @@ vtyp:
       | _ -> raise (Error.InvalidType (Format.sprintf "Invalid type: %s\n" n1))
     }
 
-funtyp:
+ftyp:
   | t1 = separated_list(RARROW,vtyp)
-    { FTFun (t1) }
+    {FTFun t1}
 
 typ:
-  | f = funtyp
+  | f = ftyp
     { TFTyp f }
   | n1 = vtyp?
     { match n1 with
@@ -46,9 +53,9 @@ typ:
     }
 
 variable:
-  | LET n = NAME EQUAL e = expr SEMICOLON
+  | LET n = NAME EQUAL e = expr
     { Let (n, TInference, e) }
-  | LET n1 = NAME DOUBLEDOT n2= typ EQUAL e = expr SEMICOLON
+  | LET n1 = NAME DOUBLEDOT n2 = typ EQUAL e = expr
     { Let (n1, n2, e) }
 
 params:
@@ -58,7 +65,7 @@ params:
     { PTyp (n1, n2) }
 
 func:
-  | LET n = NAME p = list(params) EQUAL e = expr SEMICOLON
+  | LET n = NAME p = list(params) EQUAL e = expr
     { Fun (n, TInference, p, e) }
-  | LET n1 = NAME p = list(params) DOUBLEDOT n2 = typ EQUAL e = expr SEMICOLON
+  | LET n1 = NAME p = list(params) DOUBLEDOT n2 = typ EQUAL e = expr
     { Fun (n1, n2, p, e) }
