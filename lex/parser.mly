@@ -24,6 +24,7 @@ expr:
       match e with
       | [] -> Var n
       | l ->
+         Printf.printf "Apply\n";
         Apply (n, l)
     }
   | v = variable SEMICOLON { v }

@@ -116,6 +116,7 @@ let rec check_types = function
 
         let params = List.map (fun (a, s) -> remove_var s; a) params in
 
+        add_fun n t;
         Fun (n, t, params, e) :: check_types ll
       | TInference ->
         (* TODO *)
@@ -123,6 +124,25 @@ let rec check_types = function
       | _ ->
         raise (Error.InvalidType (Format.sprintf "Expected type but got .\n"))
     end
+  | Apply (s, e) :: ll ->
+    let t = find_fun s in
+    let t =
+      match t with
+      | TFTyp FTFun f ->
+        f
+      | _ ->
+        raise (Error.InvalidType (Format.sprintf "Expected type but got .\n")) in
+    if List.length e > (List.length t - 1) then
+      raise (Error.InvalidType (Format.sprintf"Expected type %s but got %s.\n" (FTFun t |> ftyp_to_str) (List.map eval_typ e |> ttyp_to_str_l) ));
+    List.mapi (fun i a ->
+        let te = eval_typ a in
+        let t =
+          TTyp (List.nth t i) in
+        if te <> t then
+          raise (Error.InvalidType (Format.sprintf"Expected type %s but got %s.\n" (ttyp_to_str t) (ttyp_to_str te) ));
+        a
+      ) e |> ignore;
+    check_types ll
   | l :: ll ->
     l :: check_types ll
   | [] -> []
