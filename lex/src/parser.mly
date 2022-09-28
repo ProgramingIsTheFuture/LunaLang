@@ -1,5 +1,5 @@
 %{
-  open Ast
+  open Ast.Ast
 %}
 
 %token <Ast.value> VALUE
@@ -37,7 +37,7 @@ vtyp:
       | "int" -> TInt
       | "string" -> TString
       | "bool" -> TBool
-      | _ -> raise (Error.InvalidType (Format.sprintf "Invalid type: %s\n" n1))
+      | _ -> raise (Parser.Error)
     }
 
 ftyp:

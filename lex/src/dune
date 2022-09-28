@@ -6,4 +6,5 @@
 
 (library
  (name lex)
- (package lex))
+ (package lex)
+ (libraries ast))

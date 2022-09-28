@@ -16,12 +16,6 @@ type typ =
   | TFTyp of ftyp
   | TInference
 
-(*
-type typ =
-  | TTyp of string
-  | TInference
-*)
-
 type param =
   | PTyp of (string * typ)
   | PName of string

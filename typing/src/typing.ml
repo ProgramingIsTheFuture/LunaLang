@@ -1,4 +1,4 @@
-open Ast
+open Ast.Ast
 
 let typ_tbl = Hashtbl.create 1;;
 
@@ -53,7 +53,7 @@ let eval_typ = function
       try
         find_var s
       with
-      | Not_found -> raise (Error.InvalidVariable (Format.sprintf "Variable: %s is not declared.\n" s))
+      | Not_found -> raise (Error.InvalidType (Format.sprintf "Variable: %s is not declared.\n" s))
     end
   | _ -> assert false
 
