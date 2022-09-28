@@ -24,16 +24,16 @@
  (depends ocaml dune))
 
 (package
+ (name lex)
+ (synopsis "Lexer library")
+ (depends ocaml dune ast))
+
+(package
  (name compiler)
  (synopsis "Compiler library")
- (depends ocaml dune llvm))
+ (depends ocaml dune ast))
 
 (package
  (name typing)
  (synopsis "Check the AST types")
- (depends ocaml dune))
-
-(package
- (name lex)
- (synopsis "Lexer library")
- (depends ocaml dune))
+ (depends ocaml dune ast))

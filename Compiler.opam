@@ -8,7 +8,7 @@ bug-reports: "https://github.com/ProgramingIsTheFuture/Dyri/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.3"}
-  "llvm"
+  "ast"
   "odoc" {with-doc}
 ]
 build: [

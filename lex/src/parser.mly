@@ -2,7 +2,7 @@
   open Ast.Ast
 %}
 
-%token <Ast.value> VALUE
+%token <Ast.Ast.value> VALUE
 %token <string> NAME
 %token LET FOR IF ELSE RBRACE LBRACE RPARENT LPARENT BREAK
 %token DOUBLEDOT QUESTION SEMICOLON EQUAL RARROW
@@ -10,7 +10,7 @@
 
 %start code
 
-%type <Ast.code> code
+%type <code> code
 
 %%
 
@@ -37,7 +37,7 @@ vtyp:
       | "int" -> TInt
       | "string" -> TString
       | "bool" -> TBool
-      | _ -> raise (Parser.Error)
+      | _ -> raise (Error.InvalidSyntax "Type is invalid!")
     }
 
 ftyp:
