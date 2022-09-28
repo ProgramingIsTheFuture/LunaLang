@@ -19,9 +19,19 @@
  (depends ocaml dune))
 
 (package
+ (name ast)
+ (synopsis "Abstract syntax tree")
+ (depends ocaml dune))
+
+(package
  (name compiler)
  (synopsis "Compiler library")
  (depends ocaml dune llvm))
+
+(package
+ (name typing)
+ (synopsis "Check the AST types")
+ (depends ocaml dune))
 
 (package
  (name lex)
