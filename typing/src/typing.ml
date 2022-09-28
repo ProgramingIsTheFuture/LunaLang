@@ -1,4 +1,5 @@
 open Ast.Ast
+module Error = Error
 
 let typ_tbl = Hashtbl.create 1;;
 
