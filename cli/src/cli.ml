@@ -1,6 +1,6 @@
 let () =
   try
-    Lex.parse ~fname:"code.dyri" () |> ignore
+    Lex.parse ~fname:"code.dyri" () |> Typing.check_types |> ignore
   with
   | Lex.Error.InvalidKwd s ->
     Format.eprintf "%s\n" s

@@ -1,0 +1,80 @@
+{0 Language design}
+
+{1 Variables}
+
+let <name>: <type> = <value>
+
+{[
+    let a: int = 10;
+    let a: string = "Hello, World!";
+]}
+
+{2 Type inference}
+
+let <name> = <value>
+
+value must be a valid type
+
+{[
+let a = 10;
+]}
+
+{1 Named Functions}
+
+{[
+let print (x: int): int = println x;
+
+let sum (x: int): int -> int = x + 1;
+
+let sum x = x + 1;
+
+sum a;
+sum 10;
+]}
+
+{1 Anonymous Functions}
+
+{[
+// Anonymous
+x: int -> x + 1;
+let sum: int -> int = x: int -> x + 1;
+]}
+
+{1 Blocks}
+
+{[
+// New block of code
+// Allocate here
+let sum x = x + 1;
+
+let b = {
+  let a = 10;
+
+  // Return a value
+  add a
+};
+// Deallocate here
+]}
+
+{1 Conditions}
+
+Booleans will be used
+
+{[
+a = b ? ... : ...
+if a = b { ... } else { ... }
+]}
+
+{1 Loops}
+
+{[
+for i = 0 to 10 {
+  ...
+}
+
+for true {
+  if 1 = 1 {
+    break;
+  }
+}
+]}
