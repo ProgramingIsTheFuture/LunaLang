@@ -4,9 +4,9 @@ let basic_variables () =
   let t = Lex.parse ~code () in
 
   let open Ast.Ast in
-  let exp = Let ("a", TTyp (TInt), Const (VInt 10))
-            :: Let ("b", TTyp (TString), Const (VString "\"Hello World\""))
-            :: Let ("c", TTyp (TBool), Const (VBool false))
+  let exp = Let ("a", TInference, Const (VInt 10))
+            :: Let ("b", TInference, Const (VString "\"Hello World\""))
+            :: Let ("c", TInference, Const (VBool false))
             :: Var "a" :: []  in
   assert (exp = t);;
 
