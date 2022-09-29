@@ -39,7 +39,9 @@ jobs:
           dune-cache: true
 
       - name: delete .opam
-        run: rm *.opam
+        run: |
+          rm *.opam
+          opam install . --deps-only
           
       - name: Deploy odoc to GitHub Pages
         uses: ocaml/setup-ocaml/deploy-doc@v2
