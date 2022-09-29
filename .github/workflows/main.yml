@@ -33,7 +33,10 @@ jobs:
         shell: bash
       
       - name: Build docs
-        run: opam exec -- dune build @doc
+        run: |
+          rm *.opam
+          opam exec -- dune build
+          opam exec -- dune build @doc
         shell: bash
         
       - name: Deploy odoc to GitHub Pages
