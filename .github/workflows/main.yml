@@ -10,15 +10,15 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
-
-      - name: Install LLVM
-        uses: KyleMayes/install-llvm-action@v1
+      
+      - name: Install Package
+        uses: ConorMacBride/install-package@v1.1.0
         with:
-          version: "11.0"
+          brew: llvm@11
 
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v2
