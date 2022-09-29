@@ -28,5 +28,19 @@ jobs:
       - name: conf-python
         run: opam install conf-python-3.1.0.0
 
+      - name: Installing deps
+        run: opam install . --deps-only --with-doc
+        shell: bash
+
+      - name: Install odoc
+        run: opam depext --install odoc
+        shell: bash
+      
+      - name: Build docs
+        run: opam exec -- dune build @doc
+        shell: bash
+        
       - name: Deploy odoc to GitHub Pages
-        uses: ocaml/setup-ocaml/deploy-doc@v2
+        uses: peaceiris/actions-gh-pages@v3
+        with:         
+          github_token: ${{ github.token }}
