@@ -18,15 +18,12 @@ jobs:
       - name: Install Package
         uses: ConorMacBride/install-package@v1.1.0
         with:
-          brew: llvm@11
+          brew: llvm@11 python@3
 
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: 4.12.0
-
-      - name: Install deps
-        run: opam install . --deps-only
 
       - name: Deploy odoc to GitHub Pages
         uses: ocaml/setup-ocaml/deploy-doc@v2
