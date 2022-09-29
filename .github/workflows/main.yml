@@ -44,7 +44,7 @@ jobs:
           
       - name: Install deps
         run: |
-          opam install menhir
+          opam install menhir llvm
           opam install . --deps-only --with-doc
           opam depext --install odoc
           opam exec -- dune build @doc
