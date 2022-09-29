@@ -1,19 +1,12 @@
+(**  *)
+
 type value =
   | VInt of int
   | VString of string
   | VBool of bool
 
-type vtyp =
-  | TInt
-  | TString
-  | TBool
-
-type ftyp =
-  | FTFun of vtyp list
-
 type typ =
-  | TTyp of vtyp
-  | TFTyp of ftyp
+  | TTyp of string
   | TInference
 
 type param =
@@ -23,13 +16,19 @@ type param =
 type expr =
   | Const of value
   | Var of string
-  | Let of (string * typ * expr)
-  | Fun of (string * typ * param list * expr)
-  | AnFun of (param list * expr)
   | Apply of (string * expr list)
-  | If of (expr * expr)
-  | For of (value * value * expr)
-  | Loop
-  | Block of expr list
 
-type code = expr list
+(** Possible statements to use inside the Dyri language *)
+type stmt =
+  (*  *)
+  | Expr of expr
+  | Let of (string * typ * stmt)
+  | Fun of (string * typ * param list * stmt)
+  | AnFun of (param list * stmt)
+  (* need to be implemented *)
+  | If
+  | For
+  | Loop
+  | Block of stmt list
+
+type code = stmt list

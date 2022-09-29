@@ -24,6 +24,15 @@ let a = 10;
 {[
 let print (x: int): int = println x;
 
+// functions with blocks
+let works (x: int): int = {
+    println x;
+    x + 2
+};
+
+// prints 2 and returns 4
+works 2;
+
 let sum (x: int): int = x + 1;
 
 let sum x = x + 1;
