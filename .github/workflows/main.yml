@@ -23,7 +23,7 @@ jobs:
         os:
           - ubuntu-latest
         ocaml-compiler:
-          - 4.14.x
+          - 4.12.x
 
     runs-on: ${{ matrix.os }}
 
@@ -37,9 +37,8 @@ jobs:
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
 
+      - run: rm *.opam
       - run: opam install . --deps-only --with-test
-
-      - run: opam exec -- dune runtest
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
