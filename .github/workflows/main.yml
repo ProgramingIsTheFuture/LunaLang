@@ -42,7 +42,7 @@ jobs:
 
       # Runs a single command using the runners shell
       - name: Run a one-line script
-        run: dune build @doc
+        run: opam exec -- dune build @doc
 
       # Runs a set of commands using the runners shell
       - name: Deploy folder
