@@ -31,7 +31,7 @@
 (package
  (name compiler)
  (synopsis "Compiler library")
- (depends ocaml dune ast))
+ (depends ocaml dune ast llvm))
 
 (package
  (name typing)
