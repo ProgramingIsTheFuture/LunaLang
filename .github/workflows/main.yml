@@ -42,6 +42,11 @@ jobs:
         run: |
           rm *.opam
           
+      - name: Install LLVM
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "14.0"
+          
       - name: Install deps
         run: |
           opam install menhir llvm
