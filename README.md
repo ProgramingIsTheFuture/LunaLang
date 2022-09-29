@@ -1,19 +1,10 @@
 # Dyri Language
 
+Documentations for the packages used to build this language can be found at [dyri](https://programingisthefuture.github.io/Dyri/)
+
 # Design
 
-Run:
-
-```sh
-dune build @doc
-```
-
-```sh
-open _build/default/_doc/_html/index.html
-```
-
-After the browser is opened with this html page,
-click in cli.
+[design](https://programingisthefuture.github.io/Dyri/cli/design.html) can be found here!
 
 # TODO
 

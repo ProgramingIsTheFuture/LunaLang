@@ -56,6 +56,18 @@ let b = {
 // Deallocate here
 ]}
 
+{1 Types}
+
+{[
+// Enums
+type typ = Enum(int * typ) | None;
+
+// Structs
+type typ2 = {
+     name: string,
+};
+]}
+
 {1 Conditions}
 
 Booleans will be used
