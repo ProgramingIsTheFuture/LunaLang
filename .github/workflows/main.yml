@@ -36,16 +36,8 @@ jobs:
         uses: ocaml/setup-ocaml@v2
         with:
           ocaml-compiler: ${{ matrix.ocaml-compiler }}
-
-      - run: rm *.opam
-      - run: opam install . --deps-only --with-test
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: opam exec -- dune build @doc
-
-      # Runs a set of commands using the runners shell
-      - name: Deploy folder
-        uses: JamesIves/github-pages-deploy-action@v4
-        with:
-          folder: _build/default/_doc/_html/index.html # The folder the action should deploy
+          dune-cache: true
+          
+      - name: Deploy odoc to GitHub Pages
+        uses: ocaml/setup-ocaml/deploy-doc@v2
+        
