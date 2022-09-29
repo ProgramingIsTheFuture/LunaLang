@@ -1,3 +1,4 @@
 (tests
  (names lex)
+ (package lex)
  (libraries lex ast))
