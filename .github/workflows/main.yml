@@ -31,10 +31,6 @@ jobs:
       - name: Installing deps
         run: opam install . --deps-only --with-doc
         shell: bash
-
-      - name: Install odoc
-        run: opam depext --install odoc
-        shell: bash
       
       - name: Build docs
         run: opam exec -- dune build @doc
