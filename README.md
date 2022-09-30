@@ -15,8 +15,8 @@ Documentations for the packages used to build this language can be found at [dyr
   - [x] More about the blocks
   - [ ] Import and Export (support multiple files in single project)
 - Better AST
-  - [ ] Standard Ast
-  - [ ] Typed Ast
+  - [x] Standard Ast
+  - [x] Typed Ast
 - [ ] Lexer to lex and parse all the new syntax into the AST
 - [ ] Check the types that can be type-inferred and statically typed
 - [ ] Compile to LLVM
