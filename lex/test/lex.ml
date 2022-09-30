@@ -4,19 +4,19 @@ let basic_variables () =
   let t = Lex.parse ~code () in
 
   let open Ast.Ast in
-  let exp = Let ("a", TInference, Const (VInt 10))
-            :: Let ("b", TInference, Const (VString "\"Hello World\""))
-            :: Let ("c", TInference, Const (VBool false))
-            :: Var "a" :: []  in
+  let exp = Let ("a", TInference, Expr (Const (VInt 10)))
+            :: Let ("b", TInference, Expr (Const (VString "\"Hello World\"")))
+            :: Let ("c", TInference, Expr (Const (VBool false)))
+            :: Expr (Var "a") :: []  in
   assert (exp = t);;
 
 let complex_inference () =
   (* TODO *)
-  let code = "let sum (a: int): int -> int = a;" in
+  let code = "let sum (a: int): int = a;" in
   let t = Lex.parse ~code () in
 
   let open Ast.Ast in
-  let exp = Fun ("sum", TFTyp (FTFun (TInt :: TInt :: [])), PTyp ("a", TTyp (TInt)) :: [], Var "a")
+  let exp = Fun ("sum", TTyp "int", PTyp ("a", TTyp "int") :: [], Expr (Var "a"))
             :: [] in
   assert (exp = t);;
 

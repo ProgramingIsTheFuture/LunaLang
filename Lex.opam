@@ -4,6 +4,7 @@ synopsis: "Lexer library"
 maintainer: ["ProgramingIsTheFuture"]
 authors: ["ProgramingIsTheFuture"]
 homepage: "https://github.com/ProgramingIsTheFuture/Dyri"
+doc: "https://programingisthefuture.github.io/Dyri/"
 bug-reports: "https://github.com/ProgramingIsTheFuture/Dyri/issues"
 depends: [
   "ocaml"
