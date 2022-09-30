@@ -13,6 +13,8 @@
 
 (maintainers "ProgramingIsTheFuture")
 
+(documentation https://programingisthefuture.github.io/Dyri/)
+
 (package
  (name cli)
  (synopsis "Compiler cli")
