@@ -1,0 +1,2 @@
+
+val check_types: Ast.Ast.code -> Ast.TypedAst.code

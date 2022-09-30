@@ -1,5 +1,7 @@
-(** After the typing stage every variable *)
-(** will have one of these types *)
+(** AST with types *)
+
+(** After the typing stage every variable
+    will have one of these types *)
 type typ =
   | TCustom of string
   | TInt

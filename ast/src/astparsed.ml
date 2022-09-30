@@ -1,4 +1,4 @@
-(**  *)
+(** AST that we want to parse *)
 
 type value =
   | VInt of int
@@ -13,13 +13,14 @@ type param =
   | PTyp of (string * typ)
   | PName of string
 
+(** Expressions *)
 type expr =
   | Const of value
   | Var of string
-  | Apply of (string * expr list)
+  | Apply of (string * stmt list)
 
 (** Possible statements to use inside the Dyri language *)
-type stmt =
+and stmt =
   (*  *)
   | Expr of expr
   | Let of (string * typ * stmt)
