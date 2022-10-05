@@ -1,5 +1,11 @@
 (** AST with types *)
 
+type value =
+  | VInt of int
+  | VString of string
+  | VBool of bool
+;;
+
 (** After the typing stage every variable
     will have one of these types *)
 type typ =
@@ -10,28 +16,29 @@ type typ =
   (* We don't know yet or can be any type *)
   | TGeneric
 
-type value =
-  | VInt of int
-  | VString of string
-  | VBool of bool
-
 type param = string * typ
 
-type expr =
+(** Possible statements to use inside the Dyri language *)
+type desc =
+  (*  *)
   | Const of value
   | Var of string
-  | Apply of (string * expr list)
-
-(** Possible statements to use inside the Dyri language *)
-type stmt =
-  | Expr of expr
-  | Let of (string * typ * stmt)
-  | Fun of (string * typ * param list * stmt)
-  | AnFun of (param list * stmt)
+  | Apply of (string * desc list)
+  | Let of (string * typ * desc)
+  (** Both Fun and AnFun have return typ and typ for each params *)
+  | Fun of (string * param list * desc)
+  | AnFun of (param list * desc)
   (* need to be implemented *)
   | If
   | For
   | Loop
-  | Block of stmt list
+  (** Block have a return typ *)
+  | Block of desc list
+;;
+
+type stmt = {
+  typ: typ;
+  desc: desc;
+};;
 
 type code = stmt list

@@ -4,11 +4,12 @@ let basic_variables () =
   let t = Lex.parse ~code () in
 
   let open Ast.Ast in
-  let exp = Let ("a", TInference, Expr (Const (VInt 10)))
-            :: Let ("b", TInference, Expr (Const (VString "\"Hello World\"")))
-            :: Let ("c", TInference, Expr (Const (VBool false)))
-            :: Expr (Var "a") :: []  in
-  assert (exp = t);;
+  let exp = Let ("a", TInference, Const (VInt 10))
+            :: Let ("b", TInference, Const (VString "\"Hello World\""))
+            :: Let ("c", TInference, Const (VBool false))
+            :: Var "a" :: []  in
+  List.map2 (fun expp tt ->
+      assert (expp.desc = tt)) t exp |> ignore;;
 
 let complex_inference () =
   (* TODO *)
@@ -16,9 +17,10 @@ let complex_inference () =
   let t = Lex.parse ~code () in
 
   let open Ast.Ast in
-  let exp = Fun ("sum", TTyp "int", PTyp ("a", TTyp "int") :: [], Expr (Var "a"))
+  let exp = Fun ("sum", TTyp "int", PTyp ("a", TTyp "int") :: [], Var "a")
             :: [] in
-  assert (exp = t);;
+  List.map2 (fun expp tt ->
+      assert (expp.desc = tt)) t exp |> ignore;;
 
 let () =
   [basic_variables; complex_inference;]
