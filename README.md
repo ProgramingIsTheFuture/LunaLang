@@ -17,11 +17,15 @@ Documentations for the packages used to build this language can be found at [dyr
 - Better AST
   - [x] Standard Ast
   - [x] Typed Ast
+  - [ ] Operators (+, -, /, *, %)
 - [ ] Types:
   - [x] Int | Bool | String
   - [ ] Lists/Array
+- [x] Lex and Parse the AST
+  - [ ] Operators
+  - [ ] Mora data types
   - [ ] Types definition
-- [x] Lexer to lex and parse all the new syntax into the AST
+  - [ ] Blocks of code
 - [ ] Check the types that can be type-inferred and statically typed
   - [ ] Need to check types for the rest of the features
 - [ ] Compile to LLVM
