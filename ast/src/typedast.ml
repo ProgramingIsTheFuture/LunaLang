@@ -1,12 +1,14 @@
 (** AST with types *)
 
+(** [value] are the possible values for the dyri language *)
 type value =
   | VInt of int
   | VString of string
   | VBool of bool
 ;;
 
-(** After the typing stage every variable
+(** [typ] are the possible types for the language
+    After the typing stage every variable
     will have one of these types *)
 type typ =
   | TCustom of string
@@ -16,9 +18,10 @@ type typ =
   (* We don't know yet or can be any type *)
   | TGeneric
 
+(** [param] is the params for functions *)
 type param = string * typ
 
-(** Possible statements to use inside the Dyri language *)
+(** [desc] possible statements to use inside the Dyri language *)
 type desc =
   (*  *)
   | Const of value
@@ -36,9 +39,11 @@ type desc =
   | Block of desc list
 ;;
 
+(** [stmt] this is a stmt, it's created one for each stmt parsed *)
 type stmt = {
   typ: typ;
   desc: desc;
 };;
 
+(** [code] stores all the AST code from a string/file *)
 type code = stmt list
