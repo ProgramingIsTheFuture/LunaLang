@@ -122,6 +122,64 @@ let rec check_types: Ast.Ast.code -> Ast.TypedAst.code = function
 
     end
 
+  | {desc = Op (op); pos = pos} :: ll ->
+
+    let check_int = function
+      | Const (VInt _) ->
+        true
+      | Var s ->
+        find_var s = TInt
+      | _ ->
+        raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends)) in
+    begin
+      match op with
+      | Add (v1, v2) ->
+        let v1 = desc_desc v1 in
+        let v2 = desc_desc v2 in
+        let vv1 = check_int v1 in
+        let vv2 = check_int v2 in
+        if vv1 = true && vv2 = true then
+          {desc=Op(Add(v1, v2)); typ=TInt } :: check_types ll
+        else
+          raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends))
+      | Sub(v1, v2) ->
+        let v1 = desc_desc v1 in
+        let v2 = desc_desc v2 in
+        let vv1 = check_int v1 in
+        let vv2 = check_int v2 in
+        if vv1 = true && vv2 = true then
+          {desc=Op(Sub(v1, v2)); typ=TInt } :: check_types ll
+        else
+          raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends))
+      | Mul (v1, v2) ->
+        let v1 = desc_desc v1 in
+        let v2 = desc_desc v2 in
+        let vv1 = check_int v1 in
+        let vv2 = check_int v2 in
+        if vv1 = true && vv2 = true then
+          {desc=Op(Mul(v1, v2)); typ=TInt } :: check_types ll
+        else
+          raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends))
+      | Div (v1, v2) ->
+        let v1 = desc_desc v1 in
+        let v2 = desc_desc v2 in
+        let vv1 = check_int v1 in
+        let vv2 = check_int v2 in
+        if vv1 = true && vv2 = true then
+          {desc=Op(Div(v1, v2)); typ=TInt } :: check_types ll
+        else
+          raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends))
+      | Mod (v1, v2) ->
+        let v1 = desc_desc v1 in
+        let v2 = desc_desc v2 in
+        let vv1 = check_int v1 in
+        let vv2 = check_int v2 in
+        if vv1 = true && vv2 = true then
+          {desc=Op(Mod(v1, v2)); typ=TInt } :: check_types ll
+        else
+          raise (Error.InvalidType (Format.sprintf "line: %d, character: %d-%d, Invalid type\n" pos.line pos.starts pos.ends))
+    end
+
   | s :: _ ->
     Printf.printf "%d %d %d\n" s.pos.line s.pos.starts s.pos.ends;
     assert false

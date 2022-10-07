@@ -20,7 +20,18 @@ let invalid_types () =
   | Typing.Error.InvalidType _ ->
     assert true;;
 
+let operator_types () =
+  let code = "let a = 10; a + 10" in
+  let typedAst = Lex.parse ~code () |>
+                 Typing.check_types in
+
+  let open Ast.TypedAst in
+  let exp = Let ("a", TInt, Const (VInt 10))
+            :: Op ( Add (Var("a"), Const (VInt 10))) :: [] in
+
+  List.map2 (fun tc ex -> assert (tc.desc = ex)) typedAst exp |> ignore;;
+
 let () =
-  [complex_types; invalid_types;]
+  [complex_types; invalid_types; operator_types;]
   |> List.map (fun a -> a ())
   |> ignore;;
