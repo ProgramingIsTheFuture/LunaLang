@@ -51,3 +51,21 @@
 ## Want to contribute?
 - Take a look at [`contributing guidelines`](CONTRIBUTING.md).
 - Refer [GitHub Flow](https://guides.github.com/introduction/flow). 
+
+## Contributors
+
+**Thanks goes to these wonderful people ❤️**
+
+<br/>
+<div align="center">
+<a href="https://github.com/ProgramingIsTheFuture/Dyri/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ProgramingIsTheFuture/Dyri&max=100&columns=11" width=50%/>
+</a>
+</div>
+
+<br>
+<br>
+<hr>
+<h6 align="center">© Dyri 2022 
+<br>
+All Rights Reserved</h6>
