@@ -15,6 +15,7 @@
 %token <Ast.Ast.value> VALUE
 %token <string> NAME
 %token LET FOR IF ELSE RBRACE LBRACE RPARENT LPARENT BREAK
+%token ADD SUB DIV MUL MOD
 %token DOUBLEDOT QUESTION SEMICOLON EQUAL RARROW
 %token EOF
 
@@ -34,6 +35,7 @@ desc:
   | LPARENT e = desc RPARENT { e }
   | v = variable SEMICOLON { v }
   | f = func SEMICOLON { f }
+  | o = op { Op o }
 
 expr:
   | v = VALUE { Const v }
@@ -44,6 +46,18 @@ expr:
       | l ->
         Apply (n, l)
     }
+
+op:
+  | e1 = expr ADD e2 = expr
+    { Add (e1, e2) }
+  | e1 = expr SUB e2 = expr
+    { Sub (e1, e2) }
+  | e1 = expr DIV e2 = expr
+    { Div (e1, e2) }
+  | e1 = expr MUL e2 = expr
+    { Mul (e1, e2) }
+  | e1 = expr MOD e2 = expr
+    { Mod (e1, e2) }
 
 typ:
   | n1 = NAME?
