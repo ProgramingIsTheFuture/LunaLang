@@ -21,10 +21,25 @@ type typ =
 (** [param] is the params for functions *)
 type param = string * typ
 
+(** [op] are the available operatores *)
+type op =
+  (** [Add] + *)
+  | Add of (value * value)
+  (** [Sub] - *)
+  | Sub of (value * value)
+  (** [Div] / *)
+  | Div of (value * value)
+  (** [Mul] * *)
+  | Mul of (value * value)
+  (** [Mod] % *)
+  | Mod of (value * value)
+;;
+
 (** [desc] possible statements to use inside the Dyri language *)
 type desc =
   (*  *)
   | Const of value
+  | Op of op
   | Var of string
   | Apply of (string * desc list)
   | Let of (string * typ * desc)
