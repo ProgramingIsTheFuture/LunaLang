@@ -21,17 +21,17 @@ type typ =
 (** [param] is the params for functions *)
 type param = string * typ
 
-(** [op] are the available operatores *)
+(** [op] are the available operatores
+    [Add] +
+    [Sub] -
+    [Div] /
+    [Mul] *
+    [Mod] % *)
 type op =
-  (** [Add] + *)
   | Add of (value * value)
-  (** [Sub] - *)
   | Sub of (value * value)
-  (** [Div] / *)
   | Div of (value * value)
-  (** [Mul] * *)
   | Mul of (value * value)
-  (** [Mod] % *)
   | Mod of (value * value)
 ;;
 

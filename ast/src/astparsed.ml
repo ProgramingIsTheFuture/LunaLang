@@ -19,22 +19,21 @@ type param =
   | PName of string
 ;;
 
-(** [op] are the available operatores *)
+(** [op] are the available operatores
+    [Add] +
+    [Sub] -
+    [Div] /
+    [Mul] *
+    [Mod] % *)
 type op =
-  (** [Add] + *)
-  | Add of (value * value)
-  (** [Sub] - *)
-  | Sub of (value * value)
-  (** [Div] / *)
-  | Div of (value * value)
-  (** [Mul] * *)
-  | Mul of (value * value)
-  (** [Mod] % *)
-  | Mod of (value * value)
-;;
+  | Add of (desc * desc)
+  | Sub of (desc * desc)
+  | Div of (desc * desc)
+  | Mul of (desc * desc)
+  | Mod of (desc * desc)
 
 (** [desc] possible statements to use inside the Dyri language *)
-type desc =
+and desc =
   | Const of value
   | Op of op
   | Var of string

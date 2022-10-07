@@ -36,6 +36,11 @@ rule token = parse
   | '\n' { newline lexbuf; token lexbuf }
   | space+ { token lexbuf }
   | "->" { RARROW }
+  | '+' { ADD }
+  | '-' { SUB }
+  | '/' { DIV }
+  | '*' { MUL }
+  | '%' { MOD }
   | ';' { SEMICOLON }
   | '?' { QUESTION }
   | ':' { DOUBLEDOT }
