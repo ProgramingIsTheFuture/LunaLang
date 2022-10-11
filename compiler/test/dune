@@ -1,0 +1,4 @@
+(tests
+ (names compile)
+ (package compiler)
+ (libraries ast compiler))
