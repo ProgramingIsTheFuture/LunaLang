@@ -1,4 +1,4 @@
 (library
  (name compiler)
  (package compiler)
- (libraries llvm))
+ (libraries llvm ast))
