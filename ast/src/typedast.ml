@@ -2,7 +2,8 @@
 
 (** [value] are the possible values for the dyri language *)
 type value =
-  | VInt of int
+  | VInt of int64
+  | VInt32 of int32
   | VString of string
   | VBool of bool
 ;;
@@ -12,14 +13,15 @@ type value =
     will have one of these types *)
 type typ =
   | TCustom of string
-  | TInt
-  | TString
-  | TBool
-  (* We don't know yet or can be any type *)
   | TGeneric
-
-(** [param] is the params for functions *)
-type param = string * typ
+  (** sum: TSeq (int, TSeq (int, TSeq (int, None) ) ) 
+    sum: int -> int -> int 
+    let sum = (a: int) -> (b: int) -> a + b *)
+  | TSeq of typ * typ option
+  | TInt
+  | TInt32
+  | TString
+  | TBool;;
 
 (** [op] are the available operatores
     [Add] +
@@ -28,23 +30,22 @@ type param = string * typ
     [Mul] *
     [Mod] % *)
 type op =
-  | Add of (desc * desc)
-  | Sub of (desc * desc)
-  | Div of (desc * desc)
-  | Mul of (desc * desc)
-  | Mod of (desc * desc)
+  | Add
+  | Sub
+  | Div
+  | Mul
+  | Mod;;
 
 (** [desc] possible statements to use inside the Dyri language *)
-and desc =
+type desc =
   (*  *)
   | Const of value
-  | Op of op
+  | Op of desc * op * desc
   | Var of string
   | Apply of (string * desc list)
-  | Let of (string * typ * desc)
-  (** Both Fun and AnFun have return typ and typ for each params *)
-  | Fun of (string * param list * desc)
-  | AnFun of (param list * desc)
+  | Let of (string * typ) * desc
+  | Fun of (string * typ) * desc
+  | AnFun of (string * desc)
   (* need to be implemented *)
   | If
   | For

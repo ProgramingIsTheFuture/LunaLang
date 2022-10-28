@@ -2,21 +2,19 @@
 
 (** [value] are the possible values for the dyri language *)
 type value =
-  | VInt of int
+  | VInt of int64
+  | VInt32 of int32
   | VString of string
   | VBool of bool
 ;;
 
-(** [typ] are the possible types for the language *)
+(** [typ] are the possible types for the language
+ * Examples:
+ * let a = 10;
+ * let a: int = 10;
+ *)
 type typ =
-  | TTyp of string
-  | TInference
-;;
-
-(** [param] is the params for functions *)
-type param =
-  | PTyp of (string * typ)
-  | PName of string
+  | TTyp of string option
 ;;
 
 (** [op] are the available operatores
@@ -26,22 +24,23 @@ type param =
     [Mul] *
     [Mod] % *)
 type op =
-  | Add of (desc * desc)
-  | Sub of (desc * desc)
-  | Div of (desc * desc)
-  | Mul of (desc * desc)
-  | Mod of (desc * desc)
+  | Add
+  | Sub
+  | Div
+  | Mul
+  | Mod;;
 
 (** [desc] possible statements to use inside the Dyri language *)
-and desc =
+type desc =
   (*  *)
   | Const of value
-  | Op of op
+  | Op of desc * op * desc
   | Var of string
   | Apply of (string * desc list)
-  | Let of (string * typ * desc)
-  | Fun of (string * typ * param list * desc)
-  | AnFun of (param list * desc)
+  | Let of (string * typ) * desc
+  | Fun of (string * typ) * desc
+  (** a -> a + 10 *)
+  | AnFun of (string * desc)
   (* need to be implemented *)
   | If
   | For
