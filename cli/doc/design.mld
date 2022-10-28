@@ -1,5 +1,20 @@
 {0 Language design}
 
+This language is based on expressions 
+just like OCaml
+
+{2 Primitive Types}
+
+int32
+int64
+string
+char
+bool
+
+'a - Is a any type from the list above 
+'a list
+'a array
+
 {1 Variables}
 
 let <name>: <type> = <value>
@@ -41,12 +56,18 @@ sum a;
 sum 10;
 ]}
 
+This syntax is a syntatic sugar for
+{[
+    let sum = (x: int) -> x + 1;
+    let add: int -> int -> int = (x: int) -> (y: int) -> x + y;
+]}
+
 {1 Anonymous Functions}
 
 {[
 // Anonymous
 (x: int) -> x + 1;
-let sum: int = (x: int) -> x + 1;
+let sum: int -> int = (x: int) -> x + 1;
 ]}
 
 {1 Blocks}
@@ -73,8 +94,16 @@ type typ = Enum(int * typ) | None;
 
 // Structs
 type typ2 = {
-     name: string,
+    name: string,
 };
+
+let a = typ2 {
+    name: string,
+}
+
+// initialize the Enum??
+// let b = 
+
 ]}
 
 {1 Conditions}
@@ -99,3 +128,43 @@ for true {
   }
 }
 ]}
+
+{1 Interfaces}
+
+Interface is any struct that 
+have these expr names and signatures
+
+{[
+interface intername {
+    name: string
+    name2: string -> string
+};
+
+type typ2 = {
+    name: string,
+    name2: string -> string,
+};
+
+let a = typ2 {
+    name: "Hello",
+    name2: a -> a + " " + "World!",
+};
+
+let abc (i: intername) = {
+    print i.name
+}
+
+abc a;;
+]}
+
+
+{1 Simbols}
+
+{[
+let sum = ( + );;
+
+let (>>) = fun a -> fun b -> (a + b)*10 
+
+5 >> 10
+]}
+

@@ -1,48 +1,72 @@
-let basic_variables () =
-  let code =
-    "let a = 10;\nlet b = \"Hello World\";\nlet c = false;\na" in
-  let t = Lex.parse ~code () in
+open Ast.Ast
 
-  let open Ast.Ast in
-  let exp = Let ("a", TInference, Const (VInt 10))
-            :: Let ("b", TInference, Const (VString "\"Hello World\""))
-            :: Let ("c", TInference, Const (VBool false))
-            :: Var "a" :: []  in
-  List.map2 (fun expp tt ->
-      assert (expp.desc = tt)) t exp |> ignore;;
+(** (Code, Expected AST) list *)
+let test_cases = [
+  (* Example 1 *)
+  (
+  (* Code *)
+  "let a = 10; \n let b = \"Hello World\"; \n let c = false; \n",
+  (* Expected AST *)
+  Let (("a", TTyp None), 
+    Const (VInt (Int64.of_int 10)))
+  :: Let (("b", TTyp None),
+      Const (VString "\"Hello World\""))
+  :: Let (("c", TTyp None), 
+      Const (VBool false))
+  :: [],
+  "Triple variable code"
+  );
+  (* Another example *)
+  (
+    "let sum (a: int): int = a;",
+    Let (("sum", TTyp (Some "int")), 
+      Fun (("a", TTyp (Some "int")), 
+        Var "a"))
+    :: [],
+    "Let as fun with syntatic sugar sugar"
+  );
+  (* Arithmetic example *)
+  (*
+  "(5 + 5) / 2"
+   *)
+  (
+    "(5 + 5) / 2",
+    Op (
+      Op (
+        Const (VInt (Int64.of_int 5)), 
+        Add, 
+        Const(VInt (Int64.of_int 5))), 
+      Div,
+      Const(VInt (Int64.of_int 2)))
+    :: [],
+    "Basic arithmetic 5+5"
+  );
+  (* Arithmetic with variables *)
+  (
+    "let a = 10;\n a + 10",
+    Let (("a", TTyp None), 
+        Const (VInt (Int64.of_int 10)))
+    :: Op (
+        Var "a", 
+        Add, 
+        Const (VInt (Int64.of_int 10)))
+    :: [],
+    "Variable with arithmetic 'a + 10'"
+  )
+]
 
-let complex_inference () =
-  (* TODO *)
-  let code = "let sum (a: int): int = a;" in
-  let t = Lex.parse ~code () in
-
-  let open Ast.Ast in
-  let exp = Fun ("sum", TTyp "int", PTyp ("a", TTyp "int") :: [], Var "a")
-            :: [] in
-  List.map2 (fun expp tt ->
-      assert (expp.desc = tt)) t exp |> ignore;;
-
-let basic_operators () =
-  let code =
-    "2 + 5" in
-  let t = Lex.parse ~code () in
-
-  let open Ast.Ast in
-  let exp = Op (Add (Const (VInt 2), Const(VInt 5))) :: []  in
-  List.map2 (fun expp tt ->
-      assert (expp.desc = tt)) t exp |> ignore;;
-
-let invalid_operator () =
-  let code =
-    "2 + let a = 10" in
-  try
-    let _ = Lex.parse ~code () in
-    assert false
-  with
-  | Lex.Error.InvalidSyntax _ ->
-    assert true
+exception Error of string
 
 let () =
-  [basic_variables; complex_inference; basic_operators; invalid_operator;]
-  |> List.map (fun f -> f ())
+  test_cases
+  |> List.map (fun (ff, ss, msg) -> 
+      Format.printf "Testing %s\n\n" msg;
+      let c = Lex.parse ~code:(ff) () in
+      List.map2 
+        (fun a b -> 
+          if not (a.desc = b) then 
+            raise (Error msg) 
+          else Format.printf "Passed: %s\n" msg)
+        c (ss)
+     )
   |> ignore;;

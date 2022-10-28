@@ -49,7 +49,7 @@ rule token = parse
   | ')' { RPARENT }
   | '{' { LBRACE }
   | '}' { RBRACE }
-  | int as s { VALUE (VInt (int_of_string s)) }
+  | int as s { VALUE (VInt (int_of_string s |> Int64.of_int)) }
   | string as s { VALUE (VString s) }
   | bool as s { VALUE (VBool (if s = "true" then true else false)) }
   | eof { EOF }
