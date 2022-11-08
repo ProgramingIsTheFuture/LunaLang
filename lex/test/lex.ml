@@ -1,9 +1,10 @@
 open Ast.Ast
 
 (** (Code, Expected AST) list *)
-let test_cases = [
+let test_cases: (string * string * Ast.Ast.desc list) list = [
   (* Example 1 *)
   (
+  "Triple variable code",
   (* Code *)
   "let a = 10; \n let b = \"Hello World\"; \n let c = false; \n",
   (* Expected AST *)
@@ -13,23 +14,23 @@ let test_cases = [
       Const (VString "\"Hello World\""))
   :: Let (("c", TTyp None), 
       Const (VBool false))
-  :: [],
-  "Triple variable code"
+  :: []
   );
   (* Another example *)
   (
+    "Let as fun with syntatic sugar sugar",
     "let sum (a: int): int = a;",
     Let (("sum", TTyp (Some "int")), 
       Fun (("a", TTyp (Some "int")), 
         Var "a"))
-    :: [],
-    "Let as fun with syntatic sugar sugar"
+    :: []
   );
   (* Arithmetic example *)
   (*
   "(5 + 5) / 2"
    *)
   (
+    "Basic arithmetic 5+5",
     "(5 + 5) / 2",
     Op (
       Op (
@@ -38,11 +39,11 @@ let test_cases = [
         Const(VInt (Int64.of_int 5))), 
       Div,
       Const(VInt (Int64.of_int 2)))
-    :: [],
-    "Basic arithmetic 5+5"
+    :: []
   );
   (* Arithmetic with variables *)
   (
+    "Variable with arithmetic 'a + 10'",
     "let a = 10;\n a + 10",
     Let (("a", TTyp None), 
         Const (VInt (Int64.of_int 10)))
@@ -50,23 +51,14 @@ let test_cases = [
         Var "a", 
         Add, 
         Const (VInt (Int64.of_int 10)))
-    :: [],
-    "Variable with arithmetic 'a + 10'"
+    :: []
   )
 ]
 
-exception Error of string
-
 let () =
-  test_cases
-  |> List.map (fun (ff, ss, msg) -> 
-      Format.printf "Testing %s\n\n" msg;
-      let c = Lex.parse ~code:(ff) () in
-      List.map2 
-        (fun a b -> 
-          if not (a.desc = b) then 
-            raise (Error msg) 
-          else Format.printf "Passed: %s\n" msg)
-        c (ss)
-     )
-  |> ignore;;
+  let t = test_cases 
+  |> List.map 
+    (fun (ss, ff, expt) -> 
+      (ss, Ast_test.desc_of_astcode (Lex.parse ~code:(ff) ()), expt)
+    ) in
+  Ast_test.run_ast "Lex tests" t;;

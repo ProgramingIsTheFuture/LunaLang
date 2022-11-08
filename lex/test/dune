@@ -1,4 +1,4 @@
 (tests
  (names lex)
  (package lex)
- (libraries lex ast))
+ (libraries lex ast ast_test))
