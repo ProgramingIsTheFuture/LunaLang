@@ -26,6 +26,11 @@
  (depends ocaml dune))
 
 (package
+ (name ast_test)
+ (synopsis "Abstract syntax tree")
+ (depends ocaml dune alcotest))
+
+(package
  (name lex)
  (synopsis "Lexer library")
  (depends ocaml dune ast))
