@@ -3,6 +3,20 @@
 This language is based on expressions 
 just like OCaml
 
+{1 Entry}
+
+{[
+    let main () = ...
+    // Example 1
+    let main () = 0;
+
+    // Example 2
+    let main () = {
+        ...
+        0
+    };
+]}
+
 {2 Primitive Types}
 
 int32
@@ -14,6 +28,27 @@ bool
 'a - Is a any type from the list above 
 'a list
 'a array
+
+{1 Symbols}
+
+':=' -> defines
+'=' -> compares
+'>' -> bigger than
+'>=' -> bigger or equal than
+'<' -> lower than
+'<=' -> lower or equal than
+'&' -> AND
+'|' -> OR
+'->' -> Used for anonymous functions
+'?' ':' -> Ternary operator
+
+{3 aritmetic operators}
+
+'+' -> Plus
+'-' -> Minus
+'*' -> Multiply
+'/' -> Divide
+'%' -> Mod
 
 {1 Variables}
 
