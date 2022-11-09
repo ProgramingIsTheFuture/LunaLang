@@ -52,7 +52,73 @@ let test_cases: (string * string * Ast.Ast.desc list) list = [
         Add, 
         Const (VInt (Int64.of_int 10)))
     :: []
-  )
+  );
+  (
+    "Anonymous functions",
+    "let a = (x: int) -> x + 1;",
+    Let (("a", TTyp None),
+      AnFun (
+        "x", 
+        TTyp (Some "int"), 
+        Op (
+          Var("x"), 
+          Add, 
+          Const (
+            VInt (
+              Int64.of_int 1
+            )
+            
+          )
+        )
+      )
+    ) :: []
+  );
+  (
+    "Anonymous functions into a typed variable",
+    "let add: int -> int -> int = (x: int) -> (y: int) -> x + y;",
+    Let (
+      ("add", TTyp (Some "int -> int -> int")), 
+      AnFun (
+        "x", 
+        TTyp (Some "int"),
+        AnFun ("y", TTyp (Some "int"),
+          Op (Var("x"), Add, Var("y"))
+        )
+      )
+    ) :: []
+  );
+  (
+    "let Block",
+    "let b = {
+      let a = 10;
+      add a
+    };",
+    Let (
+      ("b", TTyp None),
+      Block (
+        Let (("a", TTyp None), Const (VInt (Int64.of_int 10)))
+        :: Apply ("add", (Var "a")::[])
+        :: []
+      )
+    )
+    :: []
+  );
+  (
+    "let fun Block",
+    "let b a = {
+      add a
+    };",
+    Let (
+      ("b", TTyp None),
+      Fun (("a", TTyp None),
+        Block (
+          Apply ("add", (Var "a")::[])
+          :: []
+        )
+      )
+    )
+    :: []
+  );
 ]
 
 let () =

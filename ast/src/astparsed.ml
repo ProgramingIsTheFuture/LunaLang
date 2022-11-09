@@ -39,8 +39,8 @@ type desc =
   | Apply of (string * desc list)
   | Let of (string * typ) * desc
   | Fun of (string * typ) * desc
-  (** a -> a + 10 *)
-  | AnFun of (string * desc)
+  (** (a: typ) -> a + 10 *)
+  | AnFun of (string * typ * desc)
   (* need to be implemented *)
   | If
   | For

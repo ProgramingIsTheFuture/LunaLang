@@ -45,7 +45,7 @@ type desc =
   | Apply of (string * desc list)
   | Let of (string * typ) * desc
   | Fun of (string * typ) * desc
-  | AnFun of (string * desc)
+  | AnFun of (string * typ * desc)
   (* need to be implemented *)
   | If
   | For
