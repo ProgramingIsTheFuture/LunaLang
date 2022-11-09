@@ -15,7 +15,16 @@
 
 [Design](https://programingisthefuture.github.io/Dyri/cli/design.html) can be found here!
 
-# TODO
+# Features
+
+- Let (Declare variables)
+- Let for functions
+- Let with blocks of code (Multi line variable/function)
+- Anonymous functions
+- Arithmetic operators
+- Expression based language
+
+# TO-DO
 
 - [x] Deploy docs to github pages with github actions
 - Update language design

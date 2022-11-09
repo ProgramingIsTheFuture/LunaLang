@@ -14,9 +14,18 @@
 
 %token <Ast.Ast.value> VALUE
 %token <string> NAME
-%token LET FOR IF ELSE RBRACE LBRACE RPARENT LPARENT BREAK
+%token LET FOR IF ELSE 
+%token LBRACE "{"
+%token RBRACE "}" 
+%token LPARENT "(" 
+%token RPARENT ")" 
+%token BREAK
 %token ADD SUB DIV MUL MOD
-%token DOUBLEDOT QUESTION SEMICOLON EQUAL RARROW
+%token EQUAL "="
+%token DOUBLEDOT ":" 
+%token QUESTION "?"
+%token SEMICOLON ";" 
+%token RARROW "->"
 %token EOF
 
 %start code
@@ -31,13 +40,23 @@ stmt:
   | s = desc { to_stmt s $loc }
 
 desc:
-  | LPARENT e = desc RPARENT { print_string "PARENTS\n"; e }
-  | e = expr { print_string "No Parenms\n"; e }
-  | v = variable SEMICOLON { v }
-  | f = fun_syntatic_sugar SEMICOLON { f }
+  | "(" e = desc ")" { e }
+  | e = expr { e }
+  | b = block { b }
+  | v = variable ";" { v }
+  | f = fun_syntatic_sugar ";" { f }
+  | af = anonymous_fun { af }
 
+
+(*
+  syntax:
+    expr:
+      | operators
+      | values as constants
+      | calling functions (print a b c)
+ *)
 expr:
-  | o = op { print_string "Operator\n"; o }
+  | o = op { o }
   | v = VALUE { Const v }
   | n = NAME e = list(desc)
     {
@@ -47,6 +66,10 @@ expr:
         Apply (n, l)
     }
 
+block:
+  | "{" l = list(desc) "}"
+    {Block (l)}
+
 opop:
   | ADD { Add }
   | SUB { Sub }
@@ -54,36 +77,86 @@ opop:
   | MUL { Mul }
   | MOD { Mod }
 
-op:
-  | LPARENT e1 = expr RPARENT oo = opop e2 = expr 
-    { print_string "L e R o e\n"; Op (e1, oo, e2) }
-  | LPARENT e1 = expr oo = opop e2 = expr RPARENT
-    { print_string "L o R\n"; Op (e1, oo, e2) }
-  | e1 = expr oo = opop e2 = expr
-    { print_string "e o e\n"; Op (e1, oo, e2) }
+(* 
+   syntax:
 
-typ:
-  | DOUBLEDOT n1 = NAME { TTyp (Some n1) }
-  | n1 = NAME {
-    TTyp (Some n1)
+     op:
+      | +
+      | -
+      | /
+      ...
+
+     (.. op ..)
+     (..) op ..
+     .. op ..
+ *)
+op:
+  | "(" e1 = expr ")" oo = opop e2 = expr 
+    { Op (e1, oo, e2) }
+  | "(" e1 = expr oo = opop e2 = expr ")"
+    { Op (e1, oo, e2) }
+  | e1 = expr oo = opop e2 = expr
+    { Op (e1, oo, e2) }
+
+arrow_typ:
+  | "->" n1 = NAME {
+    n1
   }
 
+typ:
+  | ":" n1 = NAME { TTyp (Some n1) }
+  | n1 = NAME l = list(arrow_typ)?
+    {
+      match l with
+      | Some ll ->
+        let v = List.fold_left (fun s n -> 
+          s ^ " -> " ^ n
+        ) n1 ll in
+        TTyp (Some v) 
+      | None -> 
+        TTyp (Some n1) 
+    }
+
+(*
+  Syntax:
+  let n = ...
+  * and
+  let n: typ = ... 
+ *)
 variable:
-  | LET n = NAME EQUAL e = desc
+  | LET n = NAME "=" e = desc
     { Let ((n, TTyp None), e) }
-  | LET n1 = NAME DOUBLEDOT n2 = typ EQUAL e = desc
+  | LET n1 = NAME ":" n2 = typ "=" e = desc
     { Let ((n1, n2), e) }
 
+(* Helper *)
 funfun:
   | n = NAME
     { (n, None) }
-  | LPARENT n = NAME DOUBLEDOT t = typ RPARENT
+  | "(" n = NAME ":" t = typ ")"
     {
       (n, Some t)
     }
 
+(* 
+  sytnax:
+
+  One param or multiple
+  Typed or not
+  funfun:
+    | a 
+    | (a: typ)
+
+  let n funfun =
+    ...
+
+  * and 
+
+  let n funfun : typ =
+    ...
+ *)
 fun_syntatic_sugar:
-  | LET n = NAME f = list(funfun) EQUAL e = desc 
+  | LET n = NAME f = list(funfun) "=" e = desc 
     { 
       let rec h = function
         | [] -> e
@@ -95,7 +168,7 @@ fun_syntatic_sugar:
 
       Let ((n, TTyp None), h f)
     }
-  | LET n1 = NAME f = list(funfun) DOUBLEDOT n2 = typ EQUAL e = desc
+  | LET n1 = NAME f = list(funfun) ":" n2 = typ "=" e = desc
     { 
       let rec h = function
         | [] -> e
@@ -107,3 +180,6 @@ fun_syntatic_sugar:
       Let ((n1, n2), h f)
     }
 
+anonymous_fun:
+  | "(" n = NAME ":" t = typ ")" "->" e = desc 
+    { AnFun (n, t, e) }
