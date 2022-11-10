@@ -47,6 +47,7 @@
 - [ ] Check the types that can be type-inferred and statically typed
   - [ ] Need to check types for the rest of the features
 - [ ] Compile to LLVM
+- [ ] Int types (Is it an int32 or int? How to choose?)
 
 # Plan
 
