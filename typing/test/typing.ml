@@ -1,69 +1,87 @@
-(*
-let complex_types () =
-  (* Is returning a string but expected a int *)
-  let code = "let sum (a: int) (b: int): int = a;" in
-  try
-    let open Ast.TypedAst in
-    Lex.parse ~code () |>
-    Typing.check_types
-    |> List.map2 
-      (fun a b -> assert (a = b.desc))
-      (
-        Let(
-          ("sum", TInt), 
-          Fun (("a", TInt), 
-            Fun(("b", TInt), 
-              Var "a"))) :: [])
-      |> ignore;
-  with
-  | Typing.Error.InvalidType _ ->
-    assert false;;
+open Ast.TypedAst
 
-let invalid_types () =
-  (* First input is a string and a int? = Type error *)
-  let code = "let sum (a: string) (b: int): int = a;" in
-  try
-    Lex.parse ~code () |>
-    Typing.check_types |> ignore;
-    assert false
-  with
-  | Typing.Error.InvalidType _ ->
-    assert true;;
+let test_cases_desc = [
+  (
+    "Variable type",
+    "let a = 10;",
+    Let (("a", TInt), Const (VInt (Int64.of_int 10)))
+    :: []
+  );
+  (
+    "Variable int type with type",
+    "let a: int = 10;",
+    Let (("a", TInt), Const (VInt (Int64.of_int 10)))
+    :: []
+  );
+  (
+    "String let",
+    "let a: string = \"Hello World\";",
+    Let (("a", TString), Const (VString "\"Hello World\""))
+    :: []
+  );
+];;
 
-let operator_types () =
-  let code = "let a = 10; a + 10" in
-  let typedAst = Lex.parse ~code () |>
-                 Typing.check_types in
-
-  let open Ast.TypedAst in
-  let exp = Let (("a", TInt), Const (VInt (Int64.of_int 10)))
-            :: Op (Var("a"), Add, Const (VInt (Int64.of_int 10))) :: [] in
-
-  List.map2 (fun tc ex -> assert (tc.desc = ex)) typedAst exp |> ignore;;
-
-let sequential_types () =
-  let code = "let sum a b = a + b" in
-  let typedAst = Lex.parse ~code () 
-    |> Typing.check_types in
-
-  let open Ast.TypedAst in
-  let exp = Let (("sum", TInt), 
-    Fun(("a", TInt), 
-      Fun(("b", TInt), 
-        Op (Var "a", Add, Var "b")))) 
-        :: [] in
-
-  List.map2 
-    (fun tc ex -> 
-      assert ((tc.desc = ex) 
-      && (tc.typ = TSeq (TInt, 
-        Some (TSeq (TInt, 
-          Some (TSeq (TInt, 
-            None)))))) )) 
-    typedAst exp |> ignore;;
+let test_cases_stmt = [
+  (
+    "let int + let string + let = str + var ",
+    "let a: int = 10; let b = \"Hello World\"; let c = b; c",
+    { desc = Let (
+        ("a", TInt), 
+        Const (
+          VInt 
+          (Int64.of_int 10)
+        )
+      ); 
+      typ = TInt 
+    }
+    :: {
+      desc = Let (
+        ("b", TString),
+        Const (VString "\"Hello World\"")
+      );
+      typ = TString
+    }
+    :: { desc = Let (("c", TString), Var("b")); typ = TString }
+    :: { desc = Var ("c"); typ = TString }
+    :: []
+  );
+  (* ( *)
+  (*   "Fun with params", *)
+  (*   "let add (a: int): int = 10 + a;", *)
+  (*   { desc = Let ( *)
+  (*       ("add", TInt), *)
+  (*       Op (Var("a"), Add, Var("b")) *)
+  (*     ); *)
+  (*     typ = TSeq (TInt, Some TInt)  *)
+  (*   } *)
+  (*   :: { *)
+  (*     desc = Apply ( *)
+  (*       "add",   *)
+  (*       Const ( *)
+  (*         VInt  *)
+  (*         (Int64.of_int 10) *)
+  (*       ) *)
+  (*       :: Const ( *)
+  (*         VInt  *)
+  (*         (Int64.of_int 15) *)
+  (*       ) *)
+  (*       :: [] *)
+  (*     ); *)
+  (*     typ = TInt *)
+  (*   } *)
+  (*   :: [] *)
+  (* ) *)
+];;
 
 let () =
-  [complex_types; invalid_types; operator_types; sequential_types;]
-  |> List.map (fun a -> a ())
-  |> ignore;;
- *)
+  let t1 = test_cases_desc 
+  |> List.map 
+    (fun (ss, ff, expt) -> 
+      (ss, Ast_test.desc_of_typedcode (Lex.parse ~code:(ff) () |> Typing.check_types), expt)
+    ) in
+  let t2 = test_cases_stmt 
+  |> List.map 
+    (fun (ss, ff, expt) -> 
+      (ss, (Lex.parse ~code:(ff) () |> Typing.check_types), expt)
+    ) in
+  Ast_test.run_typedast "Typing tests" "Desc" "Stmt" t1 t2;;

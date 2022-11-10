@@ -1,4 +1,4 @@
 (tests
  (names typing)
  (package typing)
- (libraries typing lex ast))
+ (libraries typing lex ast ast_test))
