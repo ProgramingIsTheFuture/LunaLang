@@ -19,13 +19,13 @@ let typ_of_ast (position: string) = function
   | TTyp (Some s) ->
     begin
       match s with
-      | "int" -> TInt
-      | "bool" -> TBool
-      | "string" -> TString
+      | "int" -> TSeq(TInt, None)
+      | "bool" -> TSeq(TBool, None)
+      | "string" -> TSeq(TString, None)
       | s -> 
         let sl = String.split_on_char ' ' s in
         if List.length sl = 1 then
-          TCustom s
+          TSeq(TCustom s, None)
         else
           (* 0   1  2 *)
           (* int -> int *)
@@ -45,7 +45,7 @@ let typ_of_ast (position: string) = function
           | Some v -> v
           | None -> assert false
     end
-  | TTyp None -> TGeneric
+  | TTyp None -> TSeq(TGeneric, None)
 ;;
 
 let value_of_ast: Ast.Ast.value -> Ast.TypedAst.value = function
@@ -70,7 +70,9 @@ let rec desc_of_ast (position: string) (ast_desc: Ast.Ast.desc): Ast.TypedAst.de
     Const (value_of_ast v)
   | Var s -> Var s
   | Let ((s, t), ds) ->
-    Let ((s, typ_of_ast position t), desc_of_ast position ds)
+    let t = typ_of_ast position t in
+    let ds = desc_of_ast position ds in
+    Let ((s, t), ds)
   | Fun ((s, t), ds) ->
     Fun ((s, typ_of_ast position t), desc_of_ast position ds)
   | AnFun (s, t, ds) ->
