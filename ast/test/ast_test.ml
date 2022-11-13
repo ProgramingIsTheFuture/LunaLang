@@ -1,26 +1,10 @@
 module AstAstTest = struct
   open Ast.Ast
-  let rec to_str = function
-    | Var(s) :: ll->
-      Fmt.str "Variable: %s\n" s ^ to_str ll
-    | Const (VInt v) :: ll ->
-      Fmt.str "Const: int - %d\n" (Int64.to_int v) ^ to_str ll
-    | _ -> assert false 
-end
 
-module TypedAstTest = struct 
-  open Ast.TypedAst
-
-  let rec str_of_typ = function
-    | TInt -> "int"
-    | TString -> "string"
-    | TSeq (s, Some n) ->
-      str_of_typ s ^ " -> " ^ str_of_typ n
-    | TSeq (s, None) ->
-      str_of_typ s
-    | TBool -> 
-      "bool"
-    | _ -> assert false;;
+  let str_of_typ = function
+    | TTyp (Some s) -> s
+    | TTyp (None) -> ""
+  ;;
 
   let rec to_str = function
     | Var(s) :: ll->
@@ -36,7 +20,74 @@ module TypedAstTest = struct
     | Block (dsl) :: ll ->
       Fmt.str "Block {\n" ^ (to_str dsl) ^ "};" ^ to_str ll
     | [] -> ""
+
     | _ -> assert false 
+end
+
+module TypedAstTest = struct 
+  open Ast.TypedAst
+
+  let str_of_primitive = function
+    | TInt -> "int"
+    | TInt32 -> "int32"
+    | TString -> "string"
+    | TBool -> 
+      "bool"
+    | TGeneric ->
+      "any"
+    | TCustom s ->
+      s
+  ;;
+
+
+  let rec str_of_typ = function
+    | TSeq (s, Some n) ->
+      (str_of_primitive s) ^ " -> " ^ str_of_typ n
+    | TSeq (s, None) ->
+      str_of_primitive s
+  ;;
+
+  let str_of_op = function
+    | Add -> "+"
+    | Mul -> "*"
+    | Div -> "/"
+    | Mod -> "%"
+    | Sub -> "-"
+  ;;
+
+  let str_of_val = function
+    | VInt i -> Fmt.str "%d" (Int64.to_int i)
+    | VInt32 i -> Fmt.str "%d" (Int32.to_int i)
+    | VString s -> s
+    | VBool b -> Fmt.str "%b" b
+  ;;
+
+  let get_typ = function
+    | VInt _ -> TSeq(TInt, None)
+    | VInt32 _ -> TSeq(TInt32, None)
+    | VString _ -> TSeq(TString, None)
+    | VBool _ -> TSeq(TBool, None)
+  ;;
+
+  let rec to_str = function
+    | Var(s) :: ll->
+      Fmt.str "[Variable: %s]" s ^ to_str ll
+    | Const (v) :: ll ->
+      Fmt.str "(Const: %s = %s)" (str_of_typ (get_typ v)) (str_of_val v) ^ to_str ll
+    | Let ((s, t), ds) :: ll ->
+      Fmt.str "[Let %s (typ %s) = " s (str_of_typ t) ^ (to_str [ds]) ^ "];\n" ^ to_str ll
+    | Fun ((s, t), ds) :: ll ->
+      Fmt.str "[Fun (param: %s (typ %s)) = " s (str_of_typ t) ^ (to_str [ds]) ^ "]" ^ to_str ll
+    | AnFun (s, t, ds) :: ll ->
+      Fmt.str "[AnFun (param: %s (typ %s)) = " s (str_of_typ t) ^ (to_str [ds]) ^ "]" ^ to_str ll
+    | Block (dsl) :: ll ->
+      Fmt.str "Block {\n" ^ (to_str dsl) ^ "};\n" ^ to_str ll
+    | Op (ds1, op, ds2) :: ll->
+      Fmt.str "[Op: " ^ (to_str [ds1]) ^ " " ^ (str_of_op op) ^ " " ^ (to_str [ds2]) ^ "]" ^ to_str ll
+    | Apply (s, dsl) :: ll ->
+      Fmt.str "[Aplying " ^ s ^ "with " ^ (to_str dsl) ^ "]" ^ to_str ll
+    | [] -> ""
+    | _ :: ll -> to_str ll
 
   let rec to_str_stmt = function
     | { desc = ss; typ = _pos } :: l ->

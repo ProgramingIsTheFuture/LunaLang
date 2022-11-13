@@ -8,20 +8,25 @@ type value =
   | VBool of bool
 ;;
 
+(** [primtyp] are the primitive types of the language *)
+type primtyp =
+  | TCustom of string
+  | TGeneric
+  | TInt
+  | TInt32
+  | TString
+  | TBool
+;;
+
 (** [typ] are the possible types for the language
     After the typing stage every variable
     will have one of these types *)
 type typ =
-  | TCustom of string
-  | TGeneric
-  (** sum: TSeq (int, TSeq (int, TSeq (int, None) ) ) 
+  (* sum: TSeq (int, TSeq (int, TSeq (int, None) ) ) 
     sum: int -> int -> int 
     let sum = (a: int) -> (b: int) -> a + b *)
-  | TSeq of typ * typ option
-  | TInt
-  | TInt32
-  | TString
-  | TBool;;
+  | TSeq of primtyp * typ option
+;;
 
 (** [op] are the available operatores
     [Add] +

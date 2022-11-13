@@ -6,3 +6,6 @@ let format_position (positions: Ast.Ast.pos) =
     positions.line 
     positions.starts 
     positions.ends
+
+let invalid_type s =
+  raise (InvalidType s)

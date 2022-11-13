@@ -4,45 +4,62 @@ let test_cases_desc = [
   (
     "Variable type",
     "let a = 10;",
-    Let (("a", TInt), Const (VInt (Int64.of_int 10)))
+    Let (("a", TSeq(TInt, None)), Const (VInt (Int64.of_int 10)))
     :: []
   );
   (
     "Variable int type with type",
-    "let a: int = 10;",
-    Let (("a", TInt), Const (VInt (Int64.of_int 10)))
+    "let b: int = 10;",
+    Let (("b", TSeq(TInt, None)), Const (VInt (Int64.of_int 10)))
     :: []
   );
   (
     "String let",
-    "let a: string = \"Hello World\";",
-    Let (("a", TString), Const (VString "\"Hello World\""))
+    "let d: string = \"Hello World\";",
+    Let (("d", TSeq(TString, None)), Const (VString "\"Hello World\""))
     :: []
   );
+  (
+    "aritmetic",
+    "let f: int = 10; f + 5",
+    Let (("f", TSeq(TInt, None)), Const(VInt (Int64.of_int 10)))
+    :: Op(Var("f"), Add, Const(VInt (Int64.of_int 5)))
+    :: []
+  )
 ];;
+
+(**
+  * "let b = \"Hello World\"; let c = a; c "
+*
+    :: { desc = Let (("c", TSeq(TInt, None)), Var("a")); typ = TSeq(TInt, None) }
+    :: { desc = Var ("c"); typ = TSeq(TInt, None) }
+ *)
 
 let test_cases_stmt = [
   (
-    "let int + let string + let = str + var ",
-    "let a: int = 10; let b = \"Hello World\"; let c = b; c",
+    "let int + let string + let = str + var",
+    "let a = 10; let b = \"Hello World\"; let c = a; c",
     { desc = Let (
-        ("a", TInt), 
+        ("a", TSeq(TInt, None)), 
         Const (
           VInt 
           (Int64.of_int 10)
         )
       ); 
-      typ = TInt 
+      typ = TSeq(TInt, None) 
     }
-    :: {
+   :: {
       desc = Let (
-        ("b", TString),
+        ("b", TSeq(TString, None)),
         Const (VString "\"Hello World\"")
       );
-      typ = TString
-    }
-    :: { desc = Let (("c", TString), Var("b")); typ = TString }
-    :: { desc = Var ("c"); typ = TString }
+      typ = TSeq(TString, None)
+    }   
+    :: { desc = Let (("c", TSeq(TInt, None)), Var("a")); typ = TSeq(TInt, None) } 
+    :: { desc = Var ("c"); typ = TSeq(TInt, None)}
+    (* :: { desc = Op (Var "c", Add, Const ( *)
+    (*       VInt (Int64.of_int 1) *)
+    (*     )); typ = TSeq(TInt, None) } *)
     :: []
   );
   (* ( *)
@@ -77,11 +94,13 @@ let () =
   let t1 = test_cases_desc 
   |> List.map 
     (fun (ss, ff, expt) -> 
-      (ss, Ast_test.desc_of_typedcode (Lex.parse ~code:(ff) () |> Typing.check_types), expt)
+      let result = Ast_test.desc_of_typedcode (Lex.parse ~code:(ff) () |> Typing.check_types) in
+      (ss, expt, result)
     ) in
   let t2 = test_cases_stmt 
   |> List.map 
     (fun (ss, ff, expt) -> 
-      (ss, (Lex.parse ~code:(ff) () |> Typing.check_types), expt)
+      let result = (Lex.parse ~code:(ff) () |> Typing.check_types) in
+      (ss, expt, result)
     ) in
   Ast_test.run_typedast "Typing tests" "Desc" "Stmt" t1 t2;;
