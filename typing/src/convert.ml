@@ -79,6 +79,9 @@ let rec desc_of_ast (position: string) (ast_desc: Ast.Ast.desc): Ast.TypedAst.de
     AnFun (s, typ_of_ast position t, desc_of_ast position ds)
   | Op (ds1, op, ds2) ->
     Op(desc_of_ast position ds1, op_of_ast op, desc_of_ast position ds2)
+  | Apply (s, dsl) ->
+    let dsl = List.map (desc_of_ast position) dsl in
+    Apply (s, dsl)
   | _ -> assert false
 
 

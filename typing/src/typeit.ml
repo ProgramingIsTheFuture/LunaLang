@@ -7,17 +7,20 @@ let rec out_typ = function
   | TSeq (TInt32, Some t) -> Printf.printf "TInt32 -> "; out_typ t; 
   | TSeq(TString, Some t) -> Printf.printf "TString -> "; out_typ t;
   | TSeq (TBool, Some t) -> Printf.printf "TBool -> "; out_typ t; 
+  | TSeq (TGeneric, Some t) -> Printf.printf "any -> "; out_typ t;
+  | TSeq (TCustom s, Some t) -> Printf.printf "[%s] -> " s; out_typ t;
   | TSeq (TInt, None) -> Printf.printf "TInt"
   | TSeq (TInt32, None) -> Printf.printf "TInt32"
   | TSeq(TString, None) -> Printf.printf "TString"
   | TSeq (TBool, None) -> Printf.printf "TBool"
-  | _ -> assert false
+  | TSeq (TGeneric, None) -> Printf.printf "Any";
+  | TSeq (TCustom s, None) -> Printf.printf "[%s]" s;
   ;;
 
 let is_primitive_type = function
   | TSeq (TInt, None)
   | TSeq (TInt32, None)
-  | TSeq(TString, None)
+  | TSeq (TString, None)
   | TSeq (TBool, None) ->
     true
   | _ -> false
@@ -90,24 +93,21 @@ let lets l pos =
         then the last ds_t_typ from ds_t 
         myst be equal to typ
      **)
-    match ds_t with
-    | TSeq _ as t ->
-      if is_any typ' && is_primitive_type t then
+    let t = ds_t in
+    if is_any typ' then
+      t
+    else if is_primitive_type typ' && is_primitive_type t then
+      if t = typ' then
         t
-      else if is_any typ' && not (is_primitive_type t) then
-        tseq_last t
-      else if is_primitive_type typ' && is_primitive_type t then
-        if tseq_last t = typ' then
-          t
-        else 
-          Error.invalid_type (Format.sprintf "%s| Invalid type\n" (err_fmt pos))
-      else if is_primitive_type typ' && not(is_primitive_type t) then
-        if tseq_last t = typ' then
-          t
-        else
-          Error.invalid_type (Format.sprintf "%s| Invalid type\n" (err_fmt pos))
-      else 
+      else
         Error.invalid_type (Format.sprintf "%s| Invalid type\n" (err_fmt pos))
+    else if is_primitive_type typ' && not(is_primitive_type t) then
+      if (tseq_last t) = typ' then
+        t
+      else
+        Error.invalid_type (Format.sprintf "%s| Invalid type\n" (err_fmt pos))
+    else
+      Error.invalid_type (Format.sprintf "%s| Invalid type\n" (err_fmt pos))
   in
 
   Evaluate.add_var name typ; 
@@ -130,4 +130,74 @@ let ops op pos =
     else
       Error.invalid_type (Format.sprintf "%s| Operator with different types\n" (err_fmt pos))
   | _ -> assert false
+;;
+
+let funs fn pos =
+  Printf.printf "Funs\n\n";
+  let (s, t,ds_t) = 
+    match fn with
+    | Fun ((s, tt), ds) ->
+      let ds_t = Evaluate.eval_typ_desc (err_fmt pos) ds in
+      let t =
+        match tt with 
+        | TSeq (t, None) -> t 
+        | _ -> assert false 
+      in
+      (s, t, ds_t)
+    | _ -> assert false
+  in
+
+  Printf.printf "Fun tips";
+  out_typ (TSeq(t, None));
+  out_typ ds_t; 
+  Printf.printf "\n";
+
+  Evaluate.add_var s (TSeq(t, None));
+
+  {
+    desc = fn;
+    typ = TSeq (t, Some ds_t);
+  }
+
+;;
+
+(*
+  let a b =
+    b + 10;
+
+  a TSeq (TInt, Some (TSeq (TInt, None)))
+  a 10;
+ *)
+let apply ap pos =
+  let (s, dsl) = 
+    match ap with
+    | Apply (s, dsl) ->
+      (s, dsl)
+    | _ -> assert false
+  in
+
+  let t = Evaluate.find_var s in
+
+  let params =
+    dsl |> List.map (Evaluate.eval_typ_desc (err_fmt pos)) in
+
+  let rec ft = function
+    | (TSeq (_, None) as t, []) ->
+      t
+    | (t, []) ->
+      t
+    | (TSeq (t, Some tsl), l :: ll) ->
+      if TSeq(t, None) <> l then
+        Error.invalid_type (Format.sprintf "%s| Expected one type but got another\n" (err_fmt pos))
+      else
+        ft (tsl, ll)
+    | (TSeq (_, None), _::_) ->
+      Error.invalid_type (Format.sprintf "%s| Expected few arguments\n" (err_fmt pos))
+  in
+
+  {
+    desc = ap;
+    typ = ft (t, params);
+  }
+;;
 

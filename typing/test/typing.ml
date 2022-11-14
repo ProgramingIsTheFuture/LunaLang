@@ -57,37 +57,71 @@ let test_cases_stmt = [
     }   
     :: { desc = Let (("c", TSeq(TInt, None)), Var("a")); typ = TSeq(TInt, None) } 
     :: { desc = Var ("c"); typ = TSeq(TInt, None)}
-    (* :: { desc = Op (Var "c", Add, Const ( *)
-    (*       VInt (Int64.of_int 1) *)
-    (*     )); typ = TSeq(TInt, None) } *)
     :: []
   );
-  (* ( *)
-  (*   "Fun with params", *)
-  (*   "let add (a: int): int = 10 + a;", *)
-  (*   { desc = Let ( *)
-  (*       ("add", TInt), *)
-  (*       Op (Var("a"), Add, Var("b")) *)
-  (*     ); *)
-  (*     typ = TSeq (TInt, Some TInt)  *)
-  (*   } *)
-  (*   :: { *)
-  (*     desc = Apply ( *)
-  (*       "add",   *)
-  (*       Const ( *)
-  (*         VInt  *)
-  (*         (Int64.of_int 10) *)
-  (*       ) *)
-  (*       :: Const ( *)
-  (*         VInt  *)
-  (*         (Int64.of_int 15) *)
-  (*       ) *)
-  (*       :: [] *)
-  (*     ); *)
-  (*     typ = TInt *)
-  (*   } *)
-  (*   :: [] *)
-  (* ) *)
+  (
+    "Fun with params",
+    "let add (a:int): int = 10 + a; add 5",
+    { desc = Let (
+        ("add", TSeq(TInt, Some (TSeq(TInt, None)))),
+        Fun(("a", TSeq (TInt, None)),
+          Op (
+            Const (
+              VInt 
+              (Int64.of_int 10)
+            )
+            , Add, Var("a")
+          )
+        )
+      );
+      typ = TSeq (TInt, Some (TSeq(TInt, None))) 
+    }
+    :: {
+      desc = Apply (
+        "add",  
+        Const (
+          VInt 
+          (Int64.of_int 5)
+        )
+        :: []
+      );
+      typ = TSeq (TInt, None)
+    }
+    :: []
+  );
+  (
+    "Fun with Multi params",
+    "let add (a:int) (b: int): int = b + a; add 5 10",
+    { desc = Let (
+        ("add", TSeq(TInt, Some (TSeq(TInt, Some (TSeq (TInt, None)))))),
+        Fun(("a", TSeq (TInt, None)),
+          Fun (("b", TSeq (TInt, None)), 
+            Op (
+              Var ("b"), Add, Var("a")
+            )
+          )
+        )
+      );
+      typ = TSeq (TInt, Some (TSeq(TInt, Some (TSeq (TInt, None))))) 
+    }
+    :: {
+      desc = Apply (
+        "add",  
+        Const (
+          VInt 
+          (Int64.of_int 5)
+        ) 
+        :: Const (
+          VInt 
+          (Int64.of_int 10)
+        )
+        :: []
+      );
+      typ = TSeq (TInt, None)
+    }
+    :: []
+  )
+
 ];;
 
 let () =
