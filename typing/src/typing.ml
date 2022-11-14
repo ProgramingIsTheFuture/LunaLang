@@ -18,13 +18,16 @@ let rec check_types: Ast.Ast.code -> Ast.TypedAst.code = function
     let l = desc_of_ast (Error.format_position pos) l in
     let l = Typeit.lets l pos in 
     l :: check_types ll
-  | {desc = Fun((_s, _t), _ds); pos = _pos} :: _ll ->
-    assert false
+  | {desc = Fun _ as f; pos = pos} :: ll ->
+    let f = desc_of_ast (Error.format_position pos) f in
+    let l = Typeit.funs f pos in
+    l :: check_types ll
   | {desc = Op _ as op; pos = pos} :: ll ->
     let op = desc_of_ast (Error.format_position pos) op in
     Typeit.ops op pos :: check_types ll
-  | {desc = Apply (_s, _dsl); pos = _pos } :: _ll ->
-    assert false
+  | {desc = Apply _ as ap; pos = pos } :: ll ->
+    let ap = desc_of_ast (Error.format_position pos) ap in
+    Typeit.apply ap pos :: check_types ll
   | s :: _ ->
     Printf.printf "%s \n" (Error.format_position s.pos);
     assert false
