@@ -1,28 +1,56 @@
 open Ast.Ast
 
+let default_pos: pos = { starts = 0; ends = 0; line = 0 };;
+
 (** (Code, Expected AST) list *)
-let test_cases: (string * string * Ast.Ast.desc list) list = [
+let test_cases: (string * string * Ast.Ast.code) list = [
   (* Example 1 *)
   (
-  "Triple variable code",
-  (* Code *)
-  "let a = 10; \n let b = \"Hello World\"; \n let c = false; \n",
-  (* Expected AST *)
-  Let (("a", TTyp None), 
-    Const (VInt (Int64.of_int 10)))
-  :: Let (("b", TTyp None),
-      Const (VString "\"Hello World\""))
-  :: Let (("c", TTyp None), 
-      Const (VBool false))
-  :: []
+    "Triple variable code",
+    (* Code *)
+    "let a = 10; \n let b = \"Hello World\"; \n let c = false; \n",
+    (* Expected AST *)
+
+    { desc = Let (("a", TTyp None), 
+      {
+        desc = Const (VInt (Int64.of_int 10)); 
+        pos = default_pos;
+      });
+      pos = default_pos;
+    }
+    :: 
+    { desc = Let (("b", TTyp None), 
+      {
+        desc = Const (VString "\"Hello World\""); 
+        pos = default_pos;
+      });
+      pos = default_pos;
+    }
+    ::
+    { desc = Let (("c", TTyp None),
+      { 
+        desc = Const (VBool false); 
+        pos = default_pos;
+      });
+      pos = default_pos;
+    }
+    :: []
   );
   (* Another example *)
   (
     "Let as fun with syntatic sugar sugar",
     "let sum (a: int): int = a;",
-    Let (("sum", TTyp (Some "int")), 
-      Fun (("a", TTyp (Some "int")), 
-        Var "a"))
+    { desc = Let (("sum", TTyp (Some "int")), 
+      { 
+        desc = Fun (("a", TTyp (Some "int")), 
+          {
+            desc = Var "a"; 
+            pos = default_pos ;
+          });
+        pos = default_pos;
+      });
+      pos = default_pos;
+    }
     :: []
   );
   (* Arithmetic example *)
@@ -32,60 +60,120 @@ let test_cases: (string * string * Ast.Ast.desc list) list = [
   (
     "Basic arithmetic 5+5",
     "(5 + 5) / 2",
-    Op (
-      Op (
-        Const (VInt (Int64.of_int 5)), 
-        Add, 
-        Const(VInt (Int64.of_int 5))), 
+    { desc = Op (
+      { 
+        desc = Op (
+          { 
+            desc = Const (VInt (Int64.of_int 5)); 
+            pos = default_pos;
+          }, 
+          Add, 
+          {
+            desc = Const(VInt (Int64.of_int 5)); 
+            pos = default_pos;
+          }
+        );
+        pos = default_pos;
+        }, 
       Div,
-      Const(VInt (Int64.of_int 2)))
+      {
+        desc = Const(VInt (Int64.of_int 2)); 
+        pos = default_pos;
+      });
+      pos = default_pos;
+    }
     :: []
   );
   (* Arithmetic with variables *)
   (
     "Variable with arithmetic 'a + 10'",
     "let a = 10;\n a + 10",
-    Let (("a", TTyp None), 
-        Const (VInt (Int64.of_int 10)))
-    :: Op (
-        Var "a", 
+    { 
+      desc = Let (("a", TTyp None), 
+        { 
+          desc = Const (VInt (Int64.of_int 10));
+          pos = default_pos;
+        });
+      pos = default_pos;
+    }
+    :: 
+      { desc = Op (
+        { 
+          desc = Var "a"; 
+          pos = default_pos;
+        }, 
         Add, 
-        Const (VInt (Int64.of_int 10)))
+        { 
+          desc = Const (VInt (Int64.of_int 10));
+          pos = default_pos;
+        });
+        pos = default_pos;
+      }
     :: []
   );
   (
     "Anonymous functions",
     "let a = (x: int) -> x + 1;",
-    Let (("a", TTyp None),
-      AnFun (
-        "x", 
-        TTyp (Some "int"), 
-        Op (
-          Var("x"), 
-          Add, 
-          Const (
-            VInt (
-              Int64.of_int 1
-            )
-            
-          )
-        )
-      )
-    ) :: []
+    { 
+      desc = Let (("a", TTyp None),
+        { 
+          desc = AnFun (
+            "x", 
+            TTyp (Some "int"), 
+            {
+              desc = Op (
+                {
+                  desc = Var("x"); 
+                  pos = default_pos;
+                }, 
+                Add, 
+                { 
+                  desc = Const (VInt (Int64.of_int 1));
+                  pos = default_pos;
+                });
+              pos = default_pos;
+            });
+          pos = default_pos;
+        });
+      pos = default_pos;
+    }
+    :: []
   );
   (
     "Anonymous functions into a typed variable",
     "let add: int -> int -> int = (x: int) -> (y: int) -> x + y;",
-    Let (
-      ("add", TTyp (Some "int -> int -> int")), 
-      AnFun (
-        "x", 
-        TTyp (Some "int"),
-        AnFun ("y", TTyp (Some "int"),
-          Op (Var("x"), Add, Var("y"))
-        )
-      )
-    ) :: []
+    { 
+      desc = Let (
+        ("add", TTyp (Some "int -> int -> int")), 
+        { 
+          desc = AnFun (
+            "x", 
+            TTyp (Some "int"),
+            { 
+              desc = AnFun ("y", TTyp (Some "int"),
+                { desc = Op (
+                    { 
+                      desc = Var "x"; 
+                      pos = default_pos;
+                    }, 
+                    Add, 
+                    { 
+                      desc = Var "y"; 
+                      pos = default_pos;
+                    }
+                  );
+                  pos = default_pos;
+                }
+              );
+              pos = default_pos;
+            }
+          );
+          pos = default_pos;
+        }
+      );
+      pos = default_pos;
+    }
+    :: []
   );
   (
     "let Block",
@@ -93,14 +181,30 @@ let test_cases: (string * string * Ast.Ast.desc list) list = [
       let a = 10;
       add a
     };",
-    Let (
-      ("b", TTyp None),
-      Block (
-        Let (("a", TTyp None), Const (VInt (Int64.of_int 10)))
-        :: Apply ("add", (Var "a")::[])
-        :: []
-      )
-    )
+    { 
+      desc = Let (
+        ("b", TTyp None),
+        { desc = Block (
+          { 
+            desc = Let (("a", TTyp None), 
+              { 
+                desc = Const (VInt (Int64.of_int 10));
+                pos = default_pos;
+              }
+            );
+            pos = default_pos; 
+          }
+          :: { 
+            desc = Apply ("add", ({ desc = Var "a"; pos = default_pos})::[]);
+            pos = default_pos;
+          }
+          :: []
+        );
+        pos = default_pos;
+        }
+      );
+      pos = default_pos;
+    }
     :: []
   );
   (
@@ -108,16 +212,33 @@ let test_cases: (string * string * Ast.Ast.desc list) list = [
     "let b a = {
       add a
     };",
-    Let (
-      ("b", TTyp None),
-      Fun (("a", TTyp None),
-        Block (
-          Apply ("add", (Var "a")::[])
-          :: []
-        )
-      )
-    )
-    :: []
+    { 
+      desc = Let (
+        ("b", TTyp None),
+        { 
+          desc = Fun (("a", TTyp None),
+            {
+              desc = Block (
+                { 
+                  desc = Apply ("add", (
+                    { 
+                      desc = Var "a";
+                      pos = default_pos;
+                    }
+                    )::[]); 
+                  pos = default_pos;
+                }
+                :: []
+              );
+              pos = default_pos;
+            }
+          );
+          pos = default_pos;
+        }
+      );
+    pos = default_pos;
+  }
+  :: []
   );
 ]
 
@@ -125,6 +246,6 @@ let () =
   let t = test_cases 
   |> List.map 
     (fun (ss, ff, expt) -> 
-      (ss, Ast_test.desc_of_astcode (Lex.parse ~code:(ff) ()), expt)
+      (ss, Lex.parse ~code:(ff) (), expt)
     ) in
   Ast_test.run_ast "Lex tests" t;;

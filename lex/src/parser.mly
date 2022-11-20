@@ -34,18 +34,15 @@
 
 %%
 
-code: c = list(stmt) EOF { c }
-
-stmt:
-  | s = desc { to_stmt s $loc }
+code: c = list(desc) EOF { c }
 
 desc:
   | "(" e = desc ")" { e }
-  | e = expr { e }
-  | b = block { b }
-  | v = variable ";" { v }
-  | f = fun_syntatic_sugar ";" { f }
-  | af = anonymous_fun { af }
+  | e = expr { to_stmt e $loc }
+  | b = block { to_stmt b $loc }
+  | v = variable ";" { to_stmt v $loc }
+  | f = fun_syntatic_sugar ";" { to_stmt f $loc }
+  | af = anonymous_fun { to_stmt af $loc }
 
 
 (*
@@ -92,11 +89,23 @@ opop:
  *)
 op:
   | "(" e1 = expr ")" oo = opop e2 = expr 
-    { Op (e1, oo, e2) }
+    { 
+      let e1 = to_stmt e1 $loc in
+      let e2 = to_stmt e2 $loc in
+      Op (e1, oo, e2) 
+    }
   | "(" e1 = expr oo = opop e2 = expr ")"
-    { Op (e1, oo, e2) }
+    { 
+      let e1 = to_stmt e1 $loc in
+      let e2 = to_stmt e2 $loc in
+      Op (e1, oo, e2) 
+    }
   | e1 = expr oo = opop e2 = expr
-    { Op (e1, oo, e2) }
+    {
+      let e1 = to_stmt e1 $loc in
+      let e2 = to_stmt e2 $loc in
+      Op (e1, oo, e2) 
+    }
 
 arrow_typ:
   | "->" n1 = NAME {
@@ -161,9 +170,11 @@ fun_syntatic_sugar:
       let rec h = function
         | [] -> e
         | (nm, None) :: tl ->
-          Fun ((nm, TTyp None), h tl)
+          let e = Fun ((nm, TTyp None), h tl) in
+          to_stmt e $loc
         | (nm, Some typ) :: tl ->  
-          Fun ((nm, typ), h tl)
+          let e = Fun ((nm, typ), h tl) in
+          to_stmt e $loc
       in 
 
       Let ((n, TTyp None), h f)
@@ -173,9 +184,11 @@ fun_syntatic_sugar:
       let rec h = function
         | [] -> e
         | (nm, None) :: tl ->
-          Fun ((nm, TTyp None), h tl)
+          let e = Fun ((nm, TTyp None), h tl) in
+          to_stmt e $loc
         | (nm, Some typ) :: tl ->  
-          Fun ((nm, typ), h tl)
+          let e = Fun ((nm, typ), h tl) in
+          to_stmt e $loc
       in
       Let ((n1, n2), h f)
     }

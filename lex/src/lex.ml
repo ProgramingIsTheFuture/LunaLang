@@ -13,7 +13,7 @@ let parse ?(fname="") ?(code="") () =
           open_in fname
         with
         | Sys_error s ->
-          raise (Error.InvalidFname s)
+          raise (Error.InvalidFname ("Invalid file name: "^s^"\n"))
       in
 
       Lexing.from_channel f
@@ -30,4 +30,5 @@ let parse ?(fname="") ?(code="") () =
   with
   | Parser.Error ->
     let pos = Lexing.lexeme_start_p buf in
-    raise (Error.InvalidSyntax (Format.sprintf "Invalid syntax: File: %s, Line: %d, Character: %d-%d" (pos.pos_fname) pos.pos_lnum (pos.pos_cnum - pos.pos_bol) (pos.pos_cnum - pos.pos_bol + 1)))
+    raise (Error.InvalidSyntax (Error.fmt_err "Invalid syntax" pos))
+
