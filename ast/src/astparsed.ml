@@ -30,24 +30,6 @@ type op =
   | Mul
   | Mod;;
 
-(** [desc] possible statements to use inside the Dyri language *)
-type desc =
-  (*  *)
-  | Const of value
-  | Op of desc * op * desc
-  | Var of string
-  | Apply of (string * desc list)
-  | Let of (string * typ) * desc
-  | Fun of (string * typ) * desc
-  (** (a: typ) -> a + 10 *)
-  | AnFun of (string * typ * desc)
-  (* need to be implemented *)
-  | If
-  | For
-  | Loop
-  | Block of desc list
-;;
-
 (** [pos] stores the line and the position of the specific desc *)
 type pos = {
   starts: int;
@@ -59,7 +41,25 @@ type pos = {
 type stmt = {
   pos: pos;
   desc: desc;
-};;
+}
+
+(** [desc] possible statements to use inside the Dyri language *)
+and desc =
+  (*  *)
+  | Const of value
+  | Op of stmt * op * stmt
+  | Var of string
+  | Apply of (string * stmt list)
+  | Let of (string * typ) * stmt
+  | Fun of (string * typ) * stmt
+  (** (a: typ) -> a + 10 *)
+  | AnFun of (string * typ * stmt)
+  (* need to be implemented *)
+  | If
+  | For
+  | Loop
+  | Block of stmt list
+;;
 
 (** [code] stores all the AST code from a string/file *)
 type code = stmt list

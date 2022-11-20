@@ -8,24 +8,28 @@ type value =
   | VBool of bool
 ;;
 
-(** [primtyp] are the primitive types of the language *)
-type primtyp =
-  | TCustom of string
-  | TGeneric
-  | TInt
-  | TInt32
-  | TString
-  | TBool
-;;
-
 (** [typ] are the possible types for the language
     After the typing stage every variable
-    will have one of these types *)
+    will have one of these types
+    typ ::= 
+      | int
+      | bool
+      | str
+      | typ -> typ
+      | None
+ *)
 type typ =
   (* sum: TSeq (int, TSeq (int, TSeq (int, None) ) ) 
     sum: int -> int -> int 
     let sum = (a: int) -> (b: int) -> a + b *)
-  | TSeq of primtyp * typ option
+  | TSeq of typ * typ
+  | TInt
+  | TInt32
+  | TString
+  | TBool
+  | TCustom of string
+  | TGeneric
+;;
 ;;
 
 (** [op] are the available operatores
@@ -41,29 +45,31 @@ type op =
   | Mul
   | Mod;;
 
+(** [stmt] this is a stmt, it's created one for each stmt parsed *)
+type stmt = {
+  typ: typ;
+  desc: desc;
+}
+
 (** [desc] possible statements to use inside the Dyri language *)
-type desc =
+and desc =
   (*  *)
   | Const of value
-  | Op of desc * op * desc
+  | Op of stmt * op * stmt
   | Var of string
-  | Apply of (string * desc list)
-  | Let of (string * typ) * desc
-  | Fun of (string * typ) * desc
-  | AnFun of (string * typ * desc)
+  | Apply of (string * stmt list)
+  | Let of (string * typ) * stmt
+  | Fun of (string * typ) * stmt
+  | AnFun of (string * typ * stmt)
   (* need to be implemented *)
   | If
   | For
   | Loop
   (** Block have a return typ *)
-  | Block of desc list
+  | Block of stmt list
 ;;
 
-(** [stmt] this is a stmt, it's created one for each stmt parsed *)
-type stmt = {
-  typ: typ;
-  desc: desc;
-};;
+
 
 (** [code] stores all the AST code from a string/file *)
 type code = stmt list
