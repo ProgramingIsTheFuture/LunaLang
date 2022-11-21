@@ -38,5 +38,8 @@ module Error = Error
     After the transformation, it will type every stmt.
  *)
 let check_types (ast_code: Ast.Ast.code): Ast.TypedAst.code = 
-    List.map Convert.stmt_of_ast ast_code
+    let ctx = Hashtbl.create 1 in 
+    let l = List.map (Convert.stmt_of_ast ctx) ast_code in
+    Hashtbl.clear ctx;
+    l
 
