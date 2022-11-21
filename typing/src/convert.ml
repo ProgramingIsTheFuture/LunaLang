@@ -53,10 +53,63 @@ let typ_of_value = function
   | VString _ -> TString
 ;;
 
-let typ_of_desc _pos = function
+let rec tseq_in t dsl =
+  match dsl with
+  | TSeq (_, next) ->
+    tseq_in t next
+  | v -> v = t
+
+let rec apply_args fn dl pos =
+  match fn, dl with
+  | TSeq (v1, ft), [v2] ->
+    if v1 = v2 then
+      ft
+    else 
+      raise (Error.InvalidType 
+        (pos, 
+        "Expected type: " 
+        ^ Debug.string_of_typ v1 
+        ^ " but got: " 
+        ^ Debug.string_of_typ v2))
+  | TSeq(v1, tl1), v2 :: tl2 ->
+    if v1 = v2 then
+      apply_args tl1 tl2 pos
+    else
+      raise (Error.InvalidType 
+      (pos, 
+      "Expected type: " 
+      ^ Debug.string_of_typ v1 
+      ^ " but got: " 
+      ^ Debug.string_of_typ v2)) 
+  | _ -> 
+    raise (Error.InvalidType 
+      (pos, 
+      "Expected type: " 
+      ^ Debug.string_of_typ fn))
+
+let rec typ_of_desc ctx pos = function
   | Const v -> typ_of_value v
-  | Var _ -> TGeneric
-  | _ -> assert false
+  | Var s ->
+    Hashtbl.find ctx s
+  | Let ((_, t), ds) ->
+    let dst = typ_of_desc ctx pos ds.desc in
+    if t = TGeneric then
+      dst
+    else if t = dst then
+      dst
+    else raise (Error.InvalidType (pos, "Expected type " ^ (Debug.string_of_typ t) ^ " but got " ^ (Debug.string_of_typ dst)))
+  | Op _ ->
+    (* This must work with strings, floats, ints *)
+    TInt
+  | Fun ((_, t), ds) ->
+    TSeq(t, typ_of_desc ctx pos ds.desc)
+  | AnFun (_, t, ds) ->
+    TSeq(t, typ_of_desc ctx pos ds.desc)
+  | Apply (s, dl) ->
+    let fn = Hashtbl.find ctx s in
+    let dlt = List.map (fun a -> a.typ) dl in
+    apply_args fn dlt pos
+  | _ -> assert false;;
 
 let value_of_ast: Ast.Ast.value -> Ast.TypedAst.value = function
   | VInt v -> VInt v
@@ -73,32 +126,51 @@ let op_of_ast: Ast.Ast.op -> Ast.TypedAst.op = function
   | Sub -> Sub
 ;;
 
-let rec stmt_of_ast: Ast.Ast.stmt -> Ast.TypedAst.stmt = function
-  | { desc = Const _ as v; pos = pos } ->
-    let v = desc_of_ast pos v in
-    {desc = v; typ = typ_of_desc pos v}
-  | { desc = Var _ as v; pos = pos } ->
-    let v = desc_of_ast pos v in
-    {desc = v; typ = typ_of_desc pos v}
-  | _ -> assert false
+let rec stmt_of_ast (ctx: (string, Ast.TypedAst.typ) Hashtbl.t) : Ast.Ast.stmt -> Ast.TypedAst.stmt = function
+  | { desc = _ as v; pos = pos } ->
+    let v = desc_of_ast ctx pos v in
+    let t = typ_of_desc ctx pos v in
+    { desc = v; typ = t }
 
-and desc_of_ast (pos) (ast_desc: Ast.Ast.desc): Ast.TypedAst.desc =
+and desc_of_ast ctx (pos) (ast_desc: Ast.Ast.desc): Ast.TypedAst.desc =
   match ast_desc with
   | Const v ->
     Const (value_of_ast v)
   | Var s -> Var s
   | Let ((s, t), ds) ->
     let t = typ_of_ast pos t in
-    let ds = stmt_of_ast ds in
-    Let ((s, t), ds)
+    let ds = stmt_of_ast ctx ds in
+    let dst = typ_of_desc ctx pos ds.desc in
+    let ft = if t = TGeneric then 
+        dst 
+      else if t = dst then 
+        dst 
+      else if tseq_in t dst then
+        dst
+      else
+        raise (
+          Error.InvalidType 
+            (pos, 
+            "Expected type: " ^ Debug.string_of_typ t ^ " but got: " ^ Debug.string_of_typ dst
+            ))  in
+    Hashtbl.add ctx s ft;
+    Let ((s, ft), ds)
   | Fun ((s, t), ds) ->
-    Fun ((s, typ_of_ast pos t), stmt_of_ast ds)
+    let new_ctx = Hashtbl.copy ctx in
+    let t = typ_of_ast pos t in
+    Hashtbl.add new_ctx s t;
+    let ds = stmt_of_ast new_ctx ds in
+    Fun ((s, t), ds)
   | AnFun (s, t, ds) ->
-    AnFun (s, typ_of_ast pos t, stmt_of_ast ds)
+    let new_ctx = Hashtbl.copy ctx in
+    let t = typ_of_ast pos t in
+    Hashtbl.add new_ctx s t;
+    let ds = stmt_of_ast new_ctx ds in
+    AnFun (s, t, ds)
   | Op (ds1, op, ds2) ->
-    Op(stmt_of_ast ds1, op_of_ast op, stmt_of_ast ds2)
+    Op(stmt_of_ast ctx ds1, op_of_ast op, stmt_of_ast ctx ds2)
   | Apply (s, dsl) ->
-    let dsl = List.map stmt_of_ast dsl in
+    let dsl = List.map (stmt_of_ast ctx) dsl in
     Apply (s, dsl)
   | _ -> assert false
 

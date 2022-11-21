@@ -112,7 +112,7 @@ module TypedAstTest = struct
     | Var(s) :: ll->
       Fmt.str "[Variable: %s]" s ^ to_str ll
     | Const (v) :: ll ->
-      Fmt.str "(Const: %s = %s)" (str_of_typ (get_typ v)) (str_of_val v) ^ to_str ll
+      Fmt.str "(Const: %s = %s) " (str_of_typ (get_typ v)) (str_of_val v) ^ to_str ll
     | Let ((s, t), ds) :: ll ->
       Fmt.str "Let %s (typ %s) = " s (str_of_typ t) ^ (to_str [ds.desc]) ^ ";\n" ^ to_str ll
     | Fun ((s, t), ds) :: ll ->
@@ -124,7 +124,7 @@ module TypedAstTest = struct
     | Op (ds1, op, ds2) :: ll->
       Fmt.str "[Op: " ^ (to_str [ds1.desc]) ^ " " ^ (str_of_op op) ^ " " ^ (to_str [ds2.desc]) ^ "]" ^ to_str ll
     | Apply (s, dsl) :: ll ->
-      Fmt.str "[Aplying " ^ s ^ "with " ^ (to_str (List.map to_desc dsl)) ^ "]" ^ to_str ll
+      Fmt.str "[Aplying " ^ s ^ " with " ^ (to_str (List.map to_desc dsl)) ^ "]" ^ to_str ll
     | [] -> ""
     | _ :: ll -> to_str ll
 
