@@ -8,45 +8,55 @@
 open Ast.Ast
 open Ast.TypedAst
 
-let typ_of_string = function
+let rec typ_of_string pos = function
   | "int" -> TInt
   | "int32" -> TInt32
   | "bool" -> TBool
   | "string" -> TString
-  | s -> TCustom s
-
-let typ_of_ast (position: string) = function
-  | TTyp (Some s) ->
-    begin
-      match s with
-      | "int" -> TSeq(TInt, None)
-      | "bool" -> TSeq(TBool, None)
-      | "string" -> TSeq(TString, None)
-      | s -> 
-        let sl = String.split_on_char ' ' s in
-        if List.length sl = 1 then
-          TSeq(TCustom s, None)
-        else
-          (* 0   1  2 *)
-          (* int -> int *)
-          let r = List.filteri
-            (fun i a ->
-              if i mod 2 <> 0 && a <> "->" then
-                raise (Error.InvalidType (Format.sprintf "%s| Invalid type" position))
-              else if i mod 2 <> 0 then
-                false
-              else true
-            ) sl 
-          |> List.fold_left 
-            (fun prev a ->
-              Some (TSeq (typ_of_string a, prev))
-            ) None in
-          match r with
-          | Some v -> v
-          | None -> assert false
-    end
-  | TTyp None -> TSeq(TGeneric, None)
+  | s -> 
+    if s = "" then
+      raise (Error.InvalidType (pos, "Expected type but got empty"))
+    else
+    let sl = String.split_on_char ' ' s in
+    if List.length sl = 1 then
+      TCustom s
+    else
+      let tips_seq = List.filteri (fun i a -> 
+        if i mod 2 <> 0 && a <> "->" then 
+          raise (Error.InvalidType (pos, "Invalid type!"))
+        else if i mod 2 <> 0 then
+          false
+        else true
+        ) sl
+      in
+      let rec h = function
+        | [tl] -> typ_of_string pos tl
+        | typ :: tl -> 
+          let t2 = h tl in
+          TSeq (typ_of_string pos typ, t2) 
+        | [] -> assert false
+      in
+      h tips_seq
 ;;
+
+
+let typ_of_ast (pos) = function
+  | TTyp (Some s) ->
+    typ_of_string pos s
+  | TTyp None -> TGeneric
+;;
+
+let typ_of_value = function
+  | VInt _ -> TInt 
+  | VInt32 _ -> TInt32
+  | VBool _ -> TBool
+  | VString _ -> TString
+;;
+
+let typ_of_desc _pos = function
+  | Const v -> typ_of_value v
+  | Var _ -> TGeneric
+  | _ -> assert false
 
 let value_of_ast: Ast.Ast.value -> Ast.TypedAst.value = function
   | VInt v -> VInt v
@@ -63,25 +73,32 @@ let op_of_ast: Ast.Ast.op -> Ast.TypedAst.op = function
   | Sub -> Sub
 ;;
 
+let rec stmt_of_ast: Ast.Ast.stmt -> Ast.TypedAst.stmt = function
+  | { desc = Const _ as v; pos = pos } ->
+    let v = desc_of_ast pos v in
+    {desc = v; typ = typ_of_desc pos v}
+  | { desc = Var _ as v; pos = pos } ->
+    let v = desc_of_ast pos v in
+    {desc = v; typ = typ_of_desc pos v}
+  | _ -> assert false
 
-let rec desc_of_ast (position: string) (ast_desc: Ast.Ast.desc): Ast.TypedAst.desc =
+and desc_of_ast (pos) (ast_desc: Ast.Ast.desc): Ast.TypedAst.desc =
   match ast_desc with
   | Const v ->
     Const (value_of_ast v)
   | Var s -> Var s
   | Let ((s, t), ds) ->
-    let t = typ_of_ast position t in
-    let ds = desc_of_ast position ds in
+    let t = typ_of_ast pos t in
+    let ds = stmt_of_ast ds in
     Let ((s, t), ds)
   | Fun ((s, t), ds) ->
-    Fun ((s, typ_of_ast position t), desc_of_ast position ds)
+    Fun ((s, typ_of_ast pos t), stmt_of_ast ds)
   | AnFun (s, t, ds) ->
-    AnFun (s, typ_of_ast position t, desc_of_ast position ds)
+    AnFun (s, typ_of_ast pos t, stmt_of_ast ds)
   | Op (ds1, op, ds2) ->
-    Op(desc_of_ast position ds1, op_of_ast op, desc_of_ast position ds2)
+    Op(stmt_of_ast ds1, op_of_ast op, stmt_of_ast ds2)
   | Apply (s, dsl) ->
-    let dsl = List.map (desc_of_ast position) dsl in
+    let dsl = List.map stmt_of_ast dsl in
     Apply (s, dsl)
   | _ -> assert false
-
 

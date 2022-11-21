@@ -9,5 +9,5 @@ let () =
   | Lex.Error.InvalidFname s ->
     Format.eprintf "%s\n" s
 
-  | Typing.Error.InvalidType s ->
+  | Typing.Error.InvalidType (_pos, s) ->
     Format.eprintf "%s\n" s
