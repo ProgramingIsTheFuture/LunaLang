@@ -1,0 +1,4 @@
+# upgrading the version, don't forget to update ocamlformat version for `deps` target in `Makefile` 
+version=0.21.0
+profile=conventional
+ocaml-version=4.12.0

@@ -37,9 +37,8 @@ module Error = Error
     Ast.TypedAst.code.
     After the transformation, it will type every stmt.
  *)
-let check_types (ast_code: Ast.Ast.code): Ast.TypedAst.code = 
-    let ctx = Hashtbl.create 1 in 
-    let l = List.map (Convert.stmt_of_ast ctx) ast_code in
-    Hashtbl.clear ctx;
-    l
-
+let check_types (ast_code : Ast.Ast.code) : Ast.TypedAst.code =
+  let ctx = Hashtbl.create 1 in
+  let l = List.map (Convert.stmt_of_ast ctx) ast_code in
+  Hashtbl.clear ctx;
+  l

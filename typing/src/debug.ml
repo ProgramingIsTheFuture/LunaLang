@@ -7,6 +7,4 @@ let rec string_of_typ = function
   | TString -> "string"
   | TGeneric -> "any"
   | TCustom s -> s
-  | TSeq (t1, t2) ->
-    string_of_typ t1 ^ " -> " ^ string_of_typ t2
-
+  | TSeq (t1, t2) -> string_of_typ t1 ^ " -> " ^ string_of_typ t2
