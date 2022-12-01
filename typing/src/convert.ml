@@ -70,7 +70,7 @@ let rec apply_args fn dl pos =
 
 let rec typ_of_desc ctx pos = function
   | Const v -> typ_of_value v
-  | Var s -> Hashtbl.find ctx s
+  | Var s -> Env.Env.find s ctx
   | Let ((_, t), ds) ->
       let dst = typ_of_desc ctx pos ds.desc in
       if t = TGeneric then dst
@@ -87,7 +87,7 @@ let rec typ_of_desc ctx pos = function
   | Fun ((_, t), ds) -> TSeq (t, typ_of_desc ctx pos ds.desc)
   | AnFun (_, t, ds) -> TSeq (t, typ_of_desc ctx pos ds.desc)
   | Apply (s, dl) ->
-      let fn = Hashtbl.find ctx s in
+      let fn = Env.Env.find s ctx in
       let dlt = List.map (fun a -> a.typ) dl in
       apply_args fn dlt pos
   | _ -> assert false
@@ -105,21 +105,23 @@ let op_of_ast : Ast.Ast.op -> Ast.TypedAst.op = function
   | Div -> Div
   | Sub -> Sub
 
-let rec stmt_of_ast (ctx : (string, Ast.TypedAst.typ) Hashtbl.t) :
-    Ast.Ast.stmt -> Ast.TypedAst.stmt = function
+let rec stmt_of_ast (ctx : Env.env) :
+    Ast.Ast.stmt -> Ast.TypedAst.stmt * Env.env option = function
   | { desc = _ as v; pos } ->
-      let v = desc_of_ast ctx pos v in
+      let v, ctx' = desc_of_ast ctx pos v in
       let t = typ_of_desc ctx pos v in
-      { desc = v; typ = t }
+      ({ desc = v; typ = t }, ctx')
 
-and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) : Ast.TypedAst.desc =
+and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) :
+    Ast.TypedAst.desc * Env.env option =
   match ast_desc with
-  | Const v -> Const (value_of_ast v)
-  | Var s -> Var s
+  | Const v -> (Const (value_of_ast v), None)
+  | Var s -> (Var s, None)
   | Let ((s, t), ds) ->
       let t = typ_of_ast pos t in
-      let ds = stmt_of_ast ctx ds in
-      let dst = typ_of_desc ctx pos ds.desc in
+      let ds, ctx' = stmt_of_ast ctx ds in
+      let ctx' = if Option.is_some ctx' then Option.get ctx' else ctx in
+      let dst = typ_of_desc ctx' pos ds.desc in
       let ft =
         if t = TGeneric then dst
         else if t = dst then dst
@@ -131,23 +133,28 @@ and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) : Ast.TypedAst.desc =
                  "Expected type: " ^ Debug.string_of_typ t ^ " but got: "
                  ^ Debug.string_of_typ dst ))
       in
-      Hashtbl.add ctx s ft;
-      Let ((s, ft), ds)
+      let ctx = Env.Env.add s ft ctx in
+      (Let ((s, ft), ds), Some ctx)
   | Fun ((s, t), ds) ->
-      let new_ctx = Hashtbl.copy ctx in
       let t = typ_of_ast pos t in
-      Hashtbl.add new_ctx s t;
-      let ds = stmt_of_ast new_ctx ds in
-      Fun ((s, t), ds)
+      let ds, _ = stmt_of_ast (Env.Env.add s t ctx) ds in
+      (Fun ((s, t), ds), None)
   | AnFun (s, t, ds) ->
-      let new_ctx = Hashtbl.copy ctx in
       let t = typ_of_ast pos t in
-      Hashtbl.add new_ctx s t;
-      let ds = stmt_of_ast new_ctx ds in
-      AnFun (s, t, ds)
+      let ds, _ = stmt_of_ast (Env.Env.add s t ctx) ds in
+      (AnFun (s, t, ds), None)
   | Op (ds1, op, ds2) ->
-      Op (stmt_of_ast ctx ds1, op_of_ast op, stmt_of_ast ctx ds2)
+      let ds1, _ = stmt_of_ast ctx ds1 in
+      let op = op_of_ast op in
+      let ds2, _ = stmt_of_ast ctx ds2 in
+      (Op (ds1, op, ds2), None)
   | Apply (s, dsl) ->
-      let dsl = List.map (stmt_of_ast ctx) dsl in
-      Apply (s, dsl)
+      let dsl =
+        List.map
+          (fun a ->
+            let d, _ = stmt_of_ast ctx a in
+            d)
+          dsl
+      in
+      (Apply (s, dsl), None)
   | _ -> assert false

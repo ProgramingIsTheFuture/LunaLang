@@ -38,7 +38,12 @@ module Error = Error
     After the transformation, it will type every stmt.
  *)
 let check_types (ast_code : Ast.Ast.code) : Ast.TypedAst.code =
-  let ctx = Hashtbl.create 1 in
-  let l = List.map (Convert.stmt_of_ast ctx) ast_code in
-  Hashtbl.clear ctx;
-  l
+  let ctx : Env.env = Env.Env.empty in
+  let rec h ctx acc = function
+    | c :: tl ->
+        let nc, ctx' = Convert.stmt_of_ast ctx c in
+        let ctx = if Option.is_some ctx' then Option.get ctx' else ctx in
+        h ctx (acc @ [ nc ]) tl
+    | [] -> acc
+  in
+  h ctx [] ast_code
