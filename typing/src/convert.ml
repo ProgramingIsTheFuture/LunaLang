@@ -35,7 +35,7 @@ let rec typ_of_string pos = function
 
 let typ_of_ast pos = function
   | TTyp (Some s) -> typ_of_string pos s
-  | TTyp None -> TGeneric
+  | TTyp None -> TVar (Tvar.V.create ())
 
 let typ_of_value = function
   | VInt _ -> TInt
@@ -68,28 +68,56 @@ let rec apply_args fn dl pos =
       raise
         (Error.InvalidType (pos, "Expected type: " ^ Debug.string_of_typ fn))
 
-let rec typ_of_desc ctx pos = function
+let cmp_typs t1 t2 =
+  match (Tvar.head t1, Tvar.head t2) with
+  | TVar { def = None; _ }, TVar { def = None; _ } -> Tvar.head t1
+  | TVar ({ def = None; _ } as t), t2 ->
+      t.def <- Some t2;
+      t2
+  | t1, TVar ({ def = None; _ } as t) ->
+      t.def <- Some t1;
+      t1
+  | t1, t2 when t1 = t2 -> t1
+  | t1, (TSeq (t21, _) as t) when t1 = t21 -> t
+  | t1, t2 ->
+      failwith
+        (Format.sprintf "Expected %s but got %s" (Debug.string_of_typ t1)
+           (Debug.string_of_typ t2))
+
+let typ_of_desc ctx _pos = function
   | Const v -> typ_of_value v
-  | Var s -> Env.Env.find s ctx
-  | Let ((_, t), ds) ->
-      let dst = typ_of_desc ctx pos ds.desc in
-      if t = TGeneric then dst
-      else if t = dst then dst
-      else
-        raise
-          (Error.InvalidType
-             ( pos,
-               "Expected type " ^ Debug.string_of_typ t ^ " but got "
-               ^ Debug.string_of_typ dst ))
+  | Var s -> Env.find s ctx
+  | Let (x, ds) ->
+      let t = Env.find x ctx in
+      let dst = ds.typ in
+      cmp_typs t dst
+  (*     if t = dst then dst *)
+  (*     else *)
+  (*       raise *)
+  (*         (Error.InvalidType *)
+  (*            ( pos, *)
+  (*              "Expected type " ^ Debug.string_of_typ t ^ " but got " *)
+  (*              ^ Debug.string_of_typ dst )) *)
   | Op _ ->
       (* This must work with strings, floats, ints *)
       TInt
-  | Fun ((_, t), ds) -> TSeq (t, typ_of_desc ctx pos ds.desc)
-  | AnFun (_, t, ds) -> TSeq (t, typ_of_desc ctx pos ds.desc)
+  | Fun (x, ds) ->
+      let t = Env.find x ctx in
+      TSeq (t, ds.typ)
+  | AnFun (x, ds) ->
+      let t = Env.find x ctx in
+      TSeq (t, ds.typ)
   | Apply (s, dl) ->
-      let fn = Env.Env.find s ctx in
+      let fn = Env.find s ctx in
       let dlt = List.map (fun a -> a.typ) dl in
-      apply_args fn dlt pos
+      let t =
+        List.fold_left
+          (fun a b ->
+            Tvar.unify a b;
+            match a with TSeq (_, t2) -> t2 | _ -> assert false)
+          fn dlt
+      in
+      t
   | _ -> assert false
 
 let value_of_ast : Ast.Ast.value -> Ast.TypedAst.value = function
@@ -104,57 +132,3 @@ let op_of_ast : Ast.Ast.op -> Ast.TypedAst.op = function
   | Mul -> Mul
   | Div -> Div
   | Sub -> Sub
-
-let rec stmt_of_ast (ctx : Env.env) :
-    Ast.Ast.stmt -> Ast.TypedAst.stmt * Env.env option = function
-  | { desc = _ as v; pos } ->
-      let v, ctx' = desc_of_ast ctx pos v in
-      let t = typ_of_desc ctx pos v in
-      ({ desc = v; typ = t }, ctx')
-
-and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) :
-    Ast.TypedAst.desc * Env.env option =
-  match ast_desc with
-  | Const v -> (Const (value_of_ast v), None)
-  | Var s -> (Var s, None)
-  | Let ((s, t), ds) ->
-      let t = typ_of_ast pos t in
-      let ds, ctx' = stmt_of_ast ctx ds in
-      let ctx' = if Option.is_some ctx' then Option.get ctx' else ctx in
-      let dst = typ_of_desc ctx' pos ds.desc in
-      let ft =
-        if t = TGeneric then dst
-        else if t = dst then dst
-        else if tseq_in t dst then dst
-        else
-          raise
-            (Error.InvalidType
-               ( pos,
-                 "Expected type: " ^ Debug.string_of_typ t ^ " but got: "
-                 ^ Debug.string_of_typ dst ))
-      in
-      let ctx = Env.Env.add s ft ctx in
-      (Let ((s, ft), ds), Some ctx)
-  | Fun ((s, t), ds) ->
-      let t = typ_of_ast pos t in
-      let ds, _ = stmt_of_ast (Env.Env.add s t ctx) ds in
-      (Fun ((s, t), ds), None)
-  | AnFun (s, t, ds) ->
-      let t = typ_of_ast pos t in
-      let ds, _ = stmt_of_ast (Env.Env.add s t ctx) ds in
-      (AnFun (s, t, ds), None)
-  | Op (ds1, op, ds2) ->
-      let ds1, _ = stmt_of_ast ctx ds1 in
-      let op = op_of_ast op in
-      let ds2, _ = stmt_of_ast ctx ds2 in
-      (Op (ds1, op, ds2), None)
-  | Apply (s, dsl) ->
-      let dsl =
-        List.map
-          (fun a ->
-            let d, _ = stmt_of_ast ctx a in
-            d)
-          dsl
-      in
-      (Apply (s, dsl), None)
-  | _ -> assert false
