@@ -27,7 +27,9 @@ type typ =
   | TString
   | TBool
   | TCustom of string
-  | TGeneric
+  | TVar of tvar
+
+and tvar = { id : int; mutable def : typ option }
 
 (** [op] are the available operatores
     [Add] +
@@ -47,9 +49,9 @@ and desc =
   | Op of stmt * op * stmt
   | Var of string
   | Apply of (string * stmt list)
-  | Let of (string * typ) * stmt
-  | Fun of (string * typ) * stmt
-  | AnFun of (string * typ * stmt)
+  | Let of string * stmt
+  | Fun of string * stmt
+  | AnFun of (string * stmt)
   (* need to be implemented *)
   | If
   | For

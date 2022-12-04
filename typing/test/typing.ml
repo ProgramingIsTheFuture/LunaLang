@@ -3,13 +3,10 @@ open Ast.TypedAst
 let test_cases_stmt =
   [
     ( "let int with type",
-      "let a:int = 10;",
+      "let a = 10;",
       [
         {
-          desc =
-            Let
-              ( ("a", TInt),
-                { desc = Const (VInt (Int64.of_int 10)); typ = TInt } );
+          desc = Let ("a", { desc = Const (VInt (Int64.of_int 10)); typ = TInt });
           typ = TInt;
         };
       ] );
@@ -17,33 +14,48 @@ let test_cases_stmt =
       "let a = 10; let b = \"Hello World\"; let c = a; c",
       [
         {
-          desc =
-            Let
-              ( ("a", TInt),
-                { desc = Const (VInt (Int64.of_int 10)); typ = TInt } );
+          desc = Let ("a", { desc = Const (VInt (Int64.of_int 10)); typ = TInt });
           typ = TInt;
         };
         {
           desc =
             Let
-              ( ("b", TString),
-                { desc = Const (VString "\"Hello World\""); typ = TString } );
+              ("b", { desc = Const (VString "\"Hello World\""); typ = TString });
           typ = TString;
         };
-        { desc = Let (("c", TInt), { desc = Var "a"; typ = TInt }); typ = TInt };
+        { desc = Let ("c", { desc = Var "a"; typ = TInt }); typ = TInt };
         { desc = Var "c"; typ = TInt };
       ] );
-    ( "Fun with params",
-      "let add (a:int): int = 10 + a; add 5",
+    ( "Identity",
+      "let f x = x;",
       [
         {
           desc =
             Let
-              ( ("add", TSeq (TInt, TInt)),
+              ( "f",
                 {
                   desc =
                     Fun
-                      ( ("a", TInt),
+                      ( "x",
+                        { desc = Var "x"; typ = TVar { def = None; id = 0 } } );
+                  typ =
+                    TSeq
+                      (TVar { def = None; id = 0 }, TVar { def = None; id = 0 });
+                } );
+          typ = TSeq (TVar { def = None; id = 0 }, TVar { def = None; id = 0 });
+        };
+      ] );
+    ( "Fun with params",
+      "let add (a:int): int->int = 10 + a; add 5",
+      [
+        {
+          desc =
+            Let
+              ( "add",
+                {
+                  desc =
+                    Fun
+                      ( "a",
                         {
                           desc =
                             Op
@@ -72,15 +84,15 @@ let test_cases_stmt =
         {
           desc =
             Let
-              ( ("add", TSeq (TInt, TSeq (TInt, TInt))),
+              ( "add",
                 {
                   desc =
                     Fun
-                      ( ("a", TInt),
+                      ( "a",
                         {
                           desc =
                             Fun
-                              ( ("b", TInt),
+                              ( "b",
                                 {
                                   desc =
                                     Op
@@ -104,6 +116,44 @@ let test_cases_stmt =
                   { desc = Const (VInt (Int64.of_int 10)); typ = TInt };
                 ] );
           typ = TInt;
+        };
+      ] );
+    ( "Inference and polymorphism",
+      "let add a = a; let b = add 10; add false",
+      [
+        {
+          desc =
+            Let
+              ( "add",
+                {
+                  desc =
+                    Fun
+                      ( "a",
+                        { desc = Var "a"; typ = TVar { def = None; id = 0 } } );
+                  typ =
+                    TSeq
+                      (TVar { def = None; id = 0 }, TVar { def = None; id = 0 });
+                } );
+          typ = TSeq (TVar { def = None; id = 0 }, TVar { def = None; id = 0 });
+        };
+        {
+          desc =
+            Let
+              ( "b",
+                {
+                  desc =
+                    Apply
+                      ( "add",
+                        [
+                          { desc = Const (VInt (Int64.of_int 10)); typ = TInt };
+                        ] );
+                  typ = TInt;
+                } );
+          typ = TInt;
+        };
+        {
+          desc = Apply ("add", [ { desc = Const (VBool false); typ = TBool } ]);
+          typ = TBool;
         };
       ] );
   ]

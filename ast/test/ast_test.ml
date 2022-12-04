@@ -84,8 +84,9 @@ module TypedAstTest = struct
     | TBool -> "bool"
     | TSeq (s1, s2) -> str_of_typ s1 ^ " -> " ^ str_of_typ s2
     | TInt32 -> "int32"
-    | TGeneric -> "any"
     | TCustom s -> s
+    | TVar { def = None; _ } -> "None"
+    | TVar { def = Some t; _ } -> str_of_typ t
 
   let get_typ = function
     | VInt _ -> TInt
@@ -111,15 +112,12 @@ module TypedAstTest = struct
     | Const v :: ll ->
         Fmt.str "(Const: %s = %s) " (str_of_typ (get_typ v)) (str_of_val v)
         ^ to_str ll
-    | Let ((s, t), ds) :: ll ->
-        Fmt.str "Let %s (typ %s) = " s (str_of_typ t)
-        ^ to_str [ ds.desc ] ^ ";\n" ^ to_str ll
-    | Fun ((s, t), ds) :: ll ->
-        Fmt.str "[Fun (param: %s (typ %s)) = " s (str_of_typ t)
-        ^ to_str [ ds.desc ] ^ "]" ^ to_str ll
-    | AnFun (s, t, ds) :: ll ->
-        Fmt.str "[AnFun (param: %s (typ %s)) = " s (str_of_typ t)
-        ^ to_str [ ds.desc ] ^ "]" ^ to_str ll
+    | Let (s, ds) :: ll ->
+        Fmt.str "Let %s = " s ^ to_str [ ds.desc ] ^ ";\n" ^ to_str ll
+    | Fun (s, ds) :: ll ->
+        Fmt.str "[Fun (param: %s) = " s ^ to_str [ ds.desc ] ^ "]" ^ to_str ll
+    | AnFun (s, ds) :: ll ->
+        Fmt.str "[AnFun (param: %s) = " s ^ to_str [ ds.desc ] ^ "]" ^ to_str ll
     | Block dsl :: ll ->
         Fmt.str "Block {\n" ^ to_str (List.map to_desc dsl) ^ "};\n" ^ to_str ll
     | Op (ds1, op, ds2) :: ll ->
@@ -133,8 +131,49 @@ module TypedAstTest = struct
     | _ :: ll -> to_str ll
 
   let rec to_str_stmt = function
-    | { desc = ss; typ = _pos } :: l -> to_str [ ss ] ^ to_str_stmt l
+    | { desc = ss; typ } :: l ->
+        str_of_typ typ ^ "\n" ^ to_str [ ss ] ^ "\n" ^ to_str_stmt l ^ "\n"
     | [] -> ""
+
+  let rec cmp_typs a b =
+    match (a, b) with
+    | TVar { def = None; _ }, TVar { def = None; _ } -> true
+    | TVar { def = Some t1; _ }, TVar { def = Some t2; _ } -> cmp_typs t1 t2
+    | TSeq (t11, t12), TSeq (t21, t22) -> cmp_typs t11 t21 && cmp_typs t12 t22
+    | TVar { def = Some t1; _ }, t2 -> cmp_typs t1 t2
+    | t1, TVar { def = Some t2; _ } -> cmp_typs t1 t2
+    | t1, t2 -> t1 = t2
+
+  let rec cmp_desc a b =
+    match (a, b) with
+    | { desc = Let (s1, ds1); typ = t1 }, { desc = Let (s2, ds2); typ = t2 } ->
+        let r1 = cmp_desc ds1 ds2 in
+        let r2 = cmp_typs t1 t2 in
+        r1 && r2 && s1 = s2
+    | { desc = Fun (s1, ds1); typ = t1 }, { desc = Fun (s2, ds2); typ = t2 } ->
+        let r1 = cmp_desc ds1 ds2 in
+        let r2 = cmp_typs t1 t2 in
+        r1 && r2 && s1 = s2
+    | { desc = AnFun (s1, ds1); typ = t1 }, { desc = AnFun (s2, ds2); typ = t2 }
+      ->
+        cmp_desc ds1 ds2 && s1 = s2 && cmp_typs t1 t2
+    | ( { desc = Op (ds11, op1, ds12); typ = t1 },
+        { desc = Op (ds21, op2, ds22); typ = t2 } ) ->
+        op1 = op2 && cmp_desc ds11 ds21 && cmp_desc ds12 ds22 && cmp_typs t1 t2
+    | ( { desc = Apply (s1, dsl1); typ = t1 },
+        { desc = Apply (s2, dsl2); typ = t2 } ) ->
+        cmp_typs t1 t2 && s1 = s2
+        && List.fold_left
+             (fun a (b, c) -> cmp_desc b c && a)
+             true
+             (List.map2 (fun a b -> (a, b)) dsl1 dsl2)
+    | { desc = Const _ as ds1; typ = t1 }, { desc = Const _ as ds2; typ = t2 }
+    | { desc = Var _ as ds1; typ = t1 }, { desc = Var _ as ds2; typ = t2 } ->
+        ds1 = ds2 && cmp_typs t1 t2
+    | { desc = ds1; typ = t1 }, { desc = ds2; typ = t2 } ->
+        cmp_typs t1 t2 && ds1 = ds2
+
+  let cmp_stmt = cmp_desc
 end
 
 let pp_ast ppf v = Fmt.pf ppf "\n%s\n" (AstAstTest.to_str v)
@@ -148,7 +187,12 @@ let comp_astcode exp resul =
   |> List.length = 0
 
 let astastcode = testable pp_ast comp_astcode
-let typedaststmt = testable pp_typed_stmt ( = )
+
+let typedaststmt =
+  testable pp_typed_stmt (fun al bl ->
+      List.map2 TypedAstTest.cmp_stmt al bl
+      |> List.filter (fun a -> a = false)
+      |> List.length = 0)
 
 let test_astast (s : string) (ast_expt : Ast.Ast.code) (ast_val : Ast.Ast.code)
     () =

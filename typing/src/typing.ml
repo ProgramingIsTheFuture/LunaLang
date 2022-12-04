@@ -1,36 +1,58 @@
 module Error = Error
 
-(* open Convert *)
+let rec stmt_of_ast (ctx : Env.env) :
+    Ast.Ast.stmt -> Ast.TypedAst.stmt * Env.env option = function
+  | { desc = _ as v; pos } ->
+      let v, t, ctx' = desc_of_ast ctx pos v in
+      ({ desc = v; typ = t }, ctx')
 
-(* let rec check_types: Ast.Ast.code -> Ast.TypedAst.code = function *)
-(*   | {desc = Const v; pos = pos} :: ll -> *)
-(*     (* Checking the const type *) *)
-(*     let cc = desc_of_ast (Error.format_position pos) (Const v) in *)
-(*     Typeit.consts cc pos *)
-(*     :: check_types ll *)
-(*   | {desc = Var _ as v; pos = pos} :: ll -> *)
-(*     (* Variable already declared *) *)
-(*     let v = desc_of_ast (Error.format_position pos) v in *)
-(*     Typeit.vars v pos *)
-(*     :: check_types ll *)
-(*   | {desc = Let _ as l; pos = pos} :: ll -> *)
-(*     let l = desc_of_ast (Error.format_position pos) l in *)
-(*     let l = Typeit.lets l pos in  *)
-(*     l :: check_types ll *)
-(*   | {desc = Fun _ as f; pos = pos} :: ll -> *)
-(*     let f = desc_of_ast (Error.format_position pos) f in *)
-(*     let l = Typeit.funs f pos in *)
-(*     l :: check_types ll *)
-(*   | {desc = Op _ as op; pos = pos} :: ll -> *)
-(*     let op = desc_of_ast (Error.format_position pos) op in *)
-(*     Typeit.ops op pos :: check_types ll *)
-(*   | {desc = Apply _ as ap; pos = pos } :: ll -> *)
-(*     let ap = desc_of_ast (Error.format_position pos) ap in *)
-(*     Typeit.apply ap pos :: check_types ll *)
-(*   | s :: _ -> *)
-(*     Printf.printf "%s \n" (Error.format_position s.pos); *)
-(*     assert false *)
-(*   | [] -> [] *)
+and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) :
+    Ast.TypedAst.desc * Ast.TypedAst.typ * Env.env option =
+  let open Ast.TypedAst in
+  match ast_desc with
+  | Const v ->
+      let v = Const (Convert.value_of_ast v) in
+      let t = Convert.typ_of_desc ctx pos v in
+      (v, t, None)
+  | Var s ->
+      let v = Var s in
+      let t = Convert.typ_of_desc ctx pos v in
+      (v, t, None)
+  | Op (e1, op, e2) ->
+      let e1, _ = stmt_of_ast ctx e1 in
+      let op = Convert.op_of_ast op in
+      let e2, _ = stmt_of_ast ctx e2 in
+      let t = TInt in
+      (Op (e1, op, e2), t, None)
+  | Let ((x, t), ds1) ->
+      let ds1, _ = stmt_of_ast ctx ds1 in
+      let t = Convert.typ_of_ast pos t in
+      let t = Convert.cmp_typs t ds1.typ in
+      let ctx = Env.add true x t ctx in
+      (Let (x, ds1), t, Some ctx)
+  | Fun ((x, t), e1) ->
+      let t = Convert.typ_of_ast pos t in
+      let ctx = Env.add false x t ctx in
+      let ds1, _ = stmt_of_ast ctx e1 in
+      let t = TSeq (t, ds1.typ) in
+      (Fun (x, ds1), t, None)
+  | AnFun (x, t, e1) ->
+      let t = Convert.typ_of_ast pos t in
+      let ctx = Env.add false x t ctx in
+      let ds1, _ = stmt_of_ast ctx e1 in
+      let t = TSeq (t, ds1.typ) in
+      (Fun (x, ds1), t, None)
+  | Apply (x, args) ->
+      let args = List.map (fun a -> stmt_of_ast ctx a |> fst) args in
+      let v = Apply (x, args) in
+      let t = Convert.typ_of_desc ctx pos v in
+      (v, t, None)
+  | _ -> assert false
+
+let convert_ast ctx c =
+  let nc, ctx' = stmt_of_ast ctx c in
+  let ctx = if Option.is_some ctx' then Option.get ctx' else ctx in
+  (ctx, nc)
 
 (** [check_types]: Ast.Ast.code -> Ast.TypedAst.code 
     This functions will transform any Ast.Ast.code into the equivalent in
@@ -38,12 +60,5 @@ module Error = Error
     After the transformation, it will type every stmt.
  *)
 let check_types (ast_code : Ast.Ast.code) : Ast.TypedAst.code =
-  let ctx : Env.env = Env.Env.empty in
-  let rec h ctx acc = function
-    | c :: tl ->
-        let nc, ctx' = Convert.stmt_of_ast ctx c in
-        let ctx = if Option.is_some ctx' then Option.get ctx' else ctx in
-        h ctx (acc @ [ nc ]) tl
-    | [] -> acc
-  in
-  h ctx [] ast_code
+  let ctx : Env.env = Env.empty in
+  List.fold_left_map convert_ast ctx ast_code |> snd
