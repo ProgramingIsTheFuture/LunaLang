@@ -1,19 +1,19 @@
-# Dyri Language
+# Luna Lang
 
-<img align="left" src="http://estruyf-github.azurewebsites.net/api/VisitorHit?user=ProgramingIsTheFuture&repo=Dyri&countColorcountColor&countColor=%237B1E7B"/>
-<img align="right" src="https://img.shields.io/github/repo-size/ProgramingIsTheFuture/Dyri?style=for-the-badge&logo=appveyor" alt="GitHub repo size"/>
+<img align="left" src="http://estruyf-github.azurewebsites.net/api/VisitorHit?user=ProgramingIsTheFuture&repo=LunaLang&countColorcountColor&countColor=%237B1E7B"/>
+<img align="right" src="https://img.shields.io/github/repo-size/ProgramingIsTheFuture/LunaLang?style=for-the-badge&logo=appveyor" alt="GitHub repo size"/>
 
-<img align="right" alt="Dyri" src="https://socialify.git.ci/ProgramingIsTheFuture/Dyri/image?description=1&descriptionEditable=Dyri%20is%20a%20general%20purpose%20language!&forks=1&issues=1&logo=https%3A%2F%2Fencrypted-tbn0.gstatic.com%2Fimages%3Fq%3Dtbn%3AANd9GcS3tdS_0pNpeosApm1sD7PrS0LAKq_KHmhYFjO8_24QL14A0r2Y9GyaNQEfl7qAHhk1EBA%26usqp%3DCAU&name=1&owner=1&pattern=Floating%20Cogs&pulls=1&stargazers=1&theme=Dark"/>
+<img align="right" alt="LunaLang" src="https://socialify.git.ci/ProgramingIsTheFuture/LunaLang/image?description=1&descriptionEditable=LunaLang%20is%20a%20general%20purpose%20language!&forks=1&issues=1&logo=https%3A%2F%2Fencrypted-tbn0.gstatic.com%2Fimages%3Fq%3Dtbn%3AANd9GcS3tdS_0pNpeosApm1sD7PrS0LAKq_KHmhYFjO8_24QL14A0r2Y9GyaNQEfl7qAHhk1EBA%26usqp%3DCAU&name=1&owner=1&pattern=Floating%20Cogs&pulls=1&stargazers=1&theme=Dark"/>
 
 <p align="center">
 <img src="https://forthebadge.com/images/badges/built-with-love.svg" alt=" forks"/>
 </p>
 
-## Documentations for the packages used to build this language can be found at [dyri](https://programingisthefuture.github.io/Dyri/)
+## Documentations for the packages used to build this language can be found at the [luna](https://programingisthefuture.github.io/LunaLang/) webiste
 
 # Design
 
-[Design](https://programingisthefuture.github.io/Dyri/cli/design.html) can be found here!
+[Design](https://programingisthefuture.github.io/LunaLang/cli/design.html) can be found here!
 
 # Features
 
@@ -68,14 +68,14 @@
 
 <br/>
 <div align="center">
-<a href="https://github.com/ProgramingIsTheFuture/Dyri/graphs/contributors">
-  <img src="https://contrib.rocks/image?repo=ProgramingIsTheFuture/Dyri&max=100&columns=11" width=50%/>
+<a href="https://github.com/ProgramingIsTheFuture/LunaLang/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ProgramingIsTheFuture/LunaLang&max=100&columns=11" width=50%/>
 </a>
 </div>
 
 <br>
 <br>
 <hr>
-<h6 align="center">© Dyri 2022 
+<h6 align="center">© LunaLang 2022 
 <br>
 All Rights Reserved</h6>

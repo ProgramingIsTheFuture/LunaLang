@@ -2,18 +2,18 @@
 
 (using menhir 2.0)
 
-(name Dyri)
+(name LunaLang)
 
 (generate_opam_files true)
 
 (source
- (github ProgramingIsTheFuture/Dyri))
+ (github ProgramingIsTheFuture/LunaLang))
 
 (authors "ProgramingIsTheFuture")
 
 (maintainers "ProgramingIsTheFuture")
 
-(documentation https://programingisthefuture.github.io/Dyri/)
+(documentation https://programingisthefuture.github.io/LunaLang/)
 
 (package
  (name cli)
