@@ -3,9 +3,9 @@ opam-version: "2.0"
 synopsis: "Compiler library"
 maintainer: ["ProgramingIsTheFuture"]
 authors: ["ProgramingIsTheFuture"]
-homepage: "https://github.com/ProgramingIsTheFuture/Dyri"
-doc: "https://programingisthefuture.github.io/Dyri/"
-bug-reports: "https://github.com/ProgramingIsTheFuture/Dyri/issues"
+homepage: "https://github.com/ProgramingIsTheFuture/LunaLang"
+doc: "https://programingisthefuture.github.io/LunaLang/"
+bug-reports: "https://github.com/ProgramingIsTheFuture/LunaLang/issues"
 depends: [
   "ocaml"
   "dune" {>= "3.3"}
@@ -27,4 +27,4 @@ build: [
     "@doc" {with-doc}
   ]
 ]
-dev-repo: "git+https://github.com/ProgramingIsTheFuture/Dyri.git"
+dev-repo: "git+https://github.com/ProgramingIsTheFuture/LunaLang.git"
