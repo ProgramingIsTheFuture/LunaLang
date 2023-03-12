@@ -16,31 +16,21 @@
 (documentation https://programingisthefuture.github.io/LunaLang/)
 
 (package
- (name cli)
- (synopsis "Compiler cli")
- (depends ocaml dune))
-
-(package
  (name ast)
  (synopsis "Abstract syntax tree")
  (depends ocaml dune))
 
 (package
- (name ast_test)
- (synopsis "Abstract syntax tree")
- (depends ocaml dune alcotest))
-
-(package
- (name lex)
- (synopsis "Lexer library")
+ (name parse)
+ (synopsis "Parse library")
  (depends ocaml dune ast))
 
 (package
- (name compiler)
+ (name gen_llvm)
  (synopsis "Compiler library")
  (depends ocaml dune ast llvm))
 
 (package
- (name typing)
+ (name typecheck)
  (synopsis "Check the AST types")
  (depends ocaml dune ast))

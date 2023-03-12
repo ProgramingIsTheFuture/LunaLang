@@ -1,4 +1,0 @@
-(library
- (name ast_test)
- (package ast_test)
- (libraries ast alcotest))

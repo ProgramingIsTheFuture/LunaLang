@@ -1,8 +1,0 @@
-{0 Lex}
-
-Lexer documentation can be found here: {!Lex}
-
-This module is used to lex and parse the first AST
-that will then be handled by other modules.
-
-The AST can be found inside the {!Ast.Ast} module.

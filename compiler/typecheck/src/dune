@@ -1,0 +1,4 @@
+(library
+ (name typecheck)
+ (package typecheck)
+ (libraries ast))

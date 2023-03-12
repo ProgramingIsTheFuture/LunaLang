@@ -1,0 +1,4 @@
+(tests
+ (names gen_llvm)
+ (package gen_llvm)
+ (libraries ast gen_llvm))
