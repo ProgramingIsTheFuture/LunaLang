@@ -1,0 +1,4 @@
+(executables
+ (names luna toplevel)
+ (libraries cmdliner parse typecheck gen_llvm))
+

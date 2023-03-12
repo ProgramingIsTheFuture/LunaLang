@@ -1,0 +1,4 @@
+(tests
+ (names typecheck)
+ (package typecheck)
+ (libraries typecheck parse ast))

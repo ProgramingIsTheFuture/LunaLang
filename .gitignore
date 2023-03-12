@@ -1,1 +1,10 @@
 _build
+*.opam
+node_modules
+
+.obsidian
+*/**/.obsidian
+
+*.s
+*.out
+*.ll

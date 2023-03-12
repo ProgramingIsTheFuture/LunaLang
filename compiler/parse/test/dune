@@ -1,0 +1,4 @@
+(tests
+ (names parse)
+ (package parse)
+ (libraries parse ast))
