@@ -19,7 +19,7 @@ module Vmap = Map.Make (Tvar.V)
 
 (* find x env devolve uma instância fresca de env(x) *)
 let find x env =
-  let open Ast.TypedAst in
+  let open Ast in
   let tx = Env.find x env.bindings in
   let s =
     Tvar.Vset.fold

@@ -1,5 +1,5 @@
 %{
-  open Ast.Ast
+  open Ast
 
   let loc_pos (loc: Lexing.position * Lexing.position): pos =
     {
@@ -8,11 +8,11 @@
       ends = (snd loc).pos_bol;
     };;
 
-  let to_stmt (desc: desc) (loc: Lexing.position * Lexing.position): stmt =
+  let to_stmt (desc: ut_desc) (loc: Lexing.position * Lexing.position): ut_stmt =
     {desc = desc; pos = loc_pos loc}
 %}
 
-%token <Ast.Ast.value> VALUE
+%token <Ast.value> VALUE
 %token <string> NAME
 %token LET FOR IF ELSE 
 %token LBRACE "{"
@@ -30,7 +30,7 @@
 
 %start code
 
-%type <code> code
+%type <ut_code> code
 
 %%
 
@@ -104,7 +104,7 @@ op:
     {
       let e1 = to_stmt e1 $loc in
       let e2 = to_stmt e2 $loc in
-      Op (e1, oo, e2) 
+      let ee:  ut_desc = Op (e1, oo, e2)  in ee
     }
 
 arrow_typ:
@@ -134,9 +134,11 @@ typ:
  *)
 variable:
   | LET n = NAME "=" e = desc
-    { Let ((n, TTyp None), e) }
+    { Let (n, TTyp None, e) }
   | LET n1 = NAME ":" n2 = typ "=" e = desc
-    { Let ((n1, n2), e) }
+    { 
+      let ee: Ast.ut_desc = Let (n1, n2, e) in ee
+    }
 
 (* Helper *)
 funfun:
@@ -170,27 +172,27 @@ fun_syntatic_sugar:
       let rec h = function
         | [] -> e
         | (nm, None) :: tl ->
-          let e = Fun ((nm, TTyp None), h tl) in
+          let e: ut_desc = Fun (nm, TTyp None, h tl) in
           to_stmt e $loc
         | (nm, Some typ) :: tl ->  
-          let e = Fun ((nm, typ), h tl) in
+          let e: ut_desc = Fun (nm, typ, h tl) in
           to_stmt e $loc
       in 
 
-      Let ((n, TTyp None), h f)
+      let ee: ut_desc = Let (n, TTyp None, h f) in ee
     }
   | LET n1 = NAME f = list(funfun) ":" n2 = typ "=" e = desc
     { 
       let rec h = function
         | [] -> e
         | (nm, None) :: tl ->
-          let e = Fun ((nm, TTyp None), h tl) in
+          let e: ut_desc = Fun (nm, TTyp None, h tl) in
           to_stmt e $loc
         | (nm, Some typ) :: tl ->  
-          let e = Fun ((nm, typ), h tl) in
+          let e: ut_desc = Fun (nm, typ, h tl) in
           to_stmt e $loc
       in
-      Let ((n1, n2), h f)
+      let ee: ut_desc = Let (n1, n2, h f) in ee
     }
 
 anonymous_fun:

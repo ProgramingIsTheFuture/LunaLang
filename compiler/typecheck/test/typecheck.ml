@@ -1,4 +1,4 @@
-open Ast.TypedAst
+open Ast
 
 let test_cases_stmt =
   [

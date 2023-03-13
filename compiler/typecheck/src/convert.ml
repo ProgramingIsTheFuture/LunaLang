@@ -1,7 +1,6 @@
 (** convert.ml Will convert Ast.Ast.* to Ast.TypedAst.* *)
 
-open Ast.Ast
-open Ast.TypedAst
+open Ast
 
 let rec typ_of_string pos = function
   | "int" -> TInt
@@ -84,7 +83,7 @@ let cmp_typs t1 t2 =
         (Format.sprintf "Expected %s but got %s" (Debug.string_of_typ t1)
            (Debug.string_of_typ t2))
 
-let typ_of_desc ctx _pos = function
+let typ_of_desc ctx _pos : Ast.desc -> Ast.typ = function
   | Const v -> typ_of_value v
   | Var s -> Env.find s ctx
   | Let (x, ds) ->
@@ -119,16 +118,3 @@ let typ_of_desc ctx _pos = function
       in
       t
   | _ -> assert false
-
-let value_of_ast : Ast.Ast.value -> Ast.TypedAst.value = function
-  | VInt v -> VInt v
-  | VInt32 v -> VInt32 v
-  | VBool v -> VBool v
-  | VString v -> VString v
-
-let op_of_ast : Ast.Ast.op -> Ast.TypedAst.op = function
-  | Add -> Add
-  | Mod -> Mod
-  | Mul -> Mul
-  | Div -> Div
-  | Sub -> Sub
