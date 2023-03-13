@@ -1,36 +1,34 @@
 module Error = Error
 
-let rec stmt_of_ast (ctx : Env.env) :
-    Ast.Ast.stmt -> Ast.TypedAst.stmt * Env.env option = function
+let rec stmt_of_ast (ctx : Env.env) : Ast.ut_stmt -> Ast.stmt * Env.env option =
+  function
   | { desc = _ as v; pos } ->
       let v, t, ctx' = desc_of_ast ctx pos v in
       ({ desc = v; typ = t }, ctx')
 
-and desc_of_ast ctx pos (ast_desc : Ast.Ast.desc) :
-    Ast.TypedAst.desc * Ast.TypedAst.typ * Env.env option =
-  let open Ast.TypedAst in
+and desc_of_ast ctx pos (ast_desc : Ast.ut_desc) :
+    Ast.desc * Ast.typ * Env.env option =
+  let open Ast in
   match ast_desc with
   | Const v ->
-      let v = Const (Convert.value_of_ast v) in
-      let t = Convert.typ_of_desc ctx pos v in
-      (v, t, None)
+      let t = Convert.typ_of_desc ctx pos (Const v) in
+      (Const v, t, None)
   | Var s ->
       let v = Var s in
       let t = Convert.typ_of_desc ctx pos v in
       (v, t, None)
   | Op (e1, op, e2) ->
       let e1, _ = stmt_of_ast ctx e1 in
-      let op = Convert.op_of_ast op in
       let e2, _ = stmt_of_ast ctx e2 in
       let t = TInt in
       (Op (e1, op, e2), t, None)
-  | Let ((x, t), ds1) ->
+  | Let (x, t, ds1) ->
       let ds1, _ = stmt_of_ast ctx ds1 in
       let t = Convert.typ_of_ast pos t in
       let t = Convert.cmp_typs t ds1.typ in
       let ctx = Env.add true x t ctx in
       (Let (x, ds1), t, Some ctx)
-  | Fun ((x, t), e1) ->
+  | Fun (x, t, e1) ->
       let t = Convert.typ_of_ast pos t in
       let ctx = Env.add false x t ctx in
       let ds1, _ = stmt_of_ast ctx e1 in
@@ -59,6 +57,6 @@ let convert_ast ctx c =
     Ast.TypedAst.code.
     After the transformation, it will type every stmt.
  *)
-let check_types (ast_code : Ast.Ast.code) : Ast.TypedAst.code =
+let check_types (ast_code : Ast.ut_code) : Ast.code =
   let ctx : Env.env = Env.empty in
   List.fold_left_map convert_ast ctx ast_code |> snd

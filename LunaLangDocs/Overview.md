@@ -1,14 +1,14 @@
-## Project structure
+# Project structure
 
 This project will contain two executables:
 - Compiler
 - Top level
 
-#### Compiler
+### Compiler
 
 The compiler will have the ability to compile or check your program.
 
-#### Top level
+### Top level
 
 The top level will evaluate expression by expression and give you the results of each expression.
 
@@ -17,7 +17,7 @@ The top level will evaluate expression by expression and give you the results of
 Both of these main executables will be stored inside the `/src` directory.
 As for the rest of the project, will be stored inside multiple libraries inside a directory called compiler.
 
-### Compiler internals
+## Compiler internals
 
 All compiler internals can be found inside the `/compiler` directory.
 Every module inside the compiler internals have a `docs` directory associated with it.

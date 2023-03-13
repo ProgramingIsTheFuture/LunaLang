@@ -1,4 +1,4 @@
-open Ast.TypedAst
+open Ast
 
 let rec string_of_typ = function
   | TInt -> "int"

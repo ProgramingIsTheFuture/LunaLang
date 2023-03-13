@@ -4,7 +4,7 @@ let set_filename fname lexbuf =
   let pos = lexbuf.Lexing.lex_curr_p in
   lexbuf.Lexing.lex_curr_p <- { pos with Lexing.pos_fname = fname }
 
-let parse ?(fname = "") ?(code = "") () =
+let parse ?(fname = "") ?(code = "") () : Ast.ut_code =
   let buf =
     if fname <> "" then
       let f =

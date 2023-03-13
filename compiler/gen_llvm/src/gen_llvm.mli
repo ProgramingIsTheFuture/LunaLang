@@ -1,2 +1,1 @@
-
-val compile: Ast.TypedAst.code -> string
+val compile : Ast.code -> string

@@ -1,4 +1,4 @@
-open Ast.TypedAst
+open Ast
 
 module V = struct
   type t = tvar

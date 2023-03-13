@@ -1,4 +1,4 @@
-open Ast.TypedAst
+open Ast
 open Types
 open Llvm
 open Constants

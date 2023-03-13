@@ -1,9 +1,9 @@
-open Ast.Ast
+open Ast
 
 let default_pos : pos = { starts = 0; ends = 0; line = 0 }
 
 (** (Code, Expected AST) list *)
-let test_cases : (string * string * Ast.Ast.code) list =
+let test_cases : (string * string * Ast.ut_code) list =
   [
     (* Example 1 *)
     ( "Triple variable code",
@@ -14,14 +14,16 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("a", TTyp None),
+              ( "a",
+                TTyp None,
                 { desc = Const (VInt (Int64.of_int 10)); pos = default_pos } );
           pos = default_pos;
         };
         {
           desc =
             Let
-              ( ("b", TTyp None),
+              ( "b",
+                TTyp None,
                 { desc = Const (VString "\"Hello World\""); pos = default_pos }
               );
           pos = default_pos;
@@ -29,8 +31,7 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("c", TTyp None),
-                { desc = Const (VBool false); pos = default_pos } );
+              ("c", TTyp None, { desc = Const (VBool false); pos = default_pos });
           pos = default_pos;
         };
       ] );
@@ -41,11 +42,13 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("sum", TTyp (Some "int")),
+              ( "sum",
+                TTyp (Some "int"),
                 {
                   desc =
                     Fun
-                      ( ("a", TTyp (Some "int")),
+                      ( "a",
+                        TTyp (Some "int"),
                         { desc = Var "a"; pos = default_pos } );
                   pos = default_pos;
                 } );
@@ -88,7 +91,8 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("a", TTyp None),
+              ( "a",
+                TTyp None,
                 { desc = Const (VInt (Int64.of_int 10)); pos = default_pos } );
           pos = default_pos;
         };
@@ -107,7 +111,8 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("a", TTyp None),
+              ( "a",
+                TTyp None,
                 {
                   desc =
                     AnFun
@@ -135,7 +140,8 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("add", TTyp (Some "int -> int -> int")),
+              ( "add",
+                TTyp (Some "int -> int -> int"),
                 {
                   desc =
                     AnFun
@@ -167,7 +173,8 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("b", TTyp None),
+              ( "b",
+                TTyp None,
                 {
                   desc =
                     Block
@@ -175,7 +182,8 @@ let test_cases : (string * string * Ast.Ast.code) list =
                         {
                           desc =
                             Let
-                              ( ("a", TTyp None),
+                              ( "a",
+                                TTyp None,
                                 {
                                   desc = Const (VInt (Int64.of_int 10));
                                   pos = default_pos;
@@ -200,11 +208,13 @@ let test_cases : (string * string * Ast.Ast.code) list =
         {
           desc =
             Let
-              ( ("b", TTyp None),
+              ( "b",
+                TTyp None,
                 {
                   desc =
                     Fun
-                      ( ("a", TTyp None),
+                      ( "a",
+                        TTyp None,
                         {
                           desc =
                             Block
