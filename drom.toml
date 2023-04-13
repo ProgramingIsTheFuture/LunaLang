@@ -1,0 +1,80 @@
+[project]
+drom-version = "0.1"
+
+authors = ["ProgramingIsTheFuture <franciscosantosfcp@hotmail.com>"]
+ci-systems = ["ubuntu-latest", "macos-latest", "windows-latest"]
+copyright = "ProgramingIsTheFuture <franciscosantosfcp@hotmail.com>"
+edition = "4.14.1"
+license = "LGPL2"
+min-edition = "4.14.0"
+name = "luna_lang"
+skeleton = "program"
+synopsis = "The Luna project"
+version = "0.1.0"
+homepage = "https://programingisthefuture.github.io/LunaLang"
+bug-reports = "https://github.com/ProgramingIsTheFuture/LunaLang/issues"
+
+# keys that you could also define:
+# odoc-target = "...odoc-target..."
+# sphinx-target = "...sphinx-target..."
+# archive = "...archive..."
+# dev-repo = "...dev-repo..."
+# bug-reports = "...bug-reports..."
+# doc-api = "...doc-api..."
+# doc-gen = "...doc-gen..."
+# homepage = "...homepage..."
+# github-organization = "...github-organization..."
+
+description = """
+Luna Lang is a programing language built with OCaml and llvm
+"""
+skip = []
+# dirs to skip while scanning for dune files
+skip-dirs = ["luna_tests"]
+# dirs to scan for share/ folders (with package names)
+share-dirs = ["share"]
+generators = ["ocamllex", "menhir"]
+
+# project-wide library dependencies (not for package-specific deps)
+[dependencies]
+
+# project-wide tools dependencies (not for package-specific deps)
+[tools.ocamlformat]
+for-test = true
+[tools.odoc]
+for-doc = true
+[tools.ppx_expect]
+for-test = true
+[tools.ppx_inline_test]
+for-test = true
+
+# build profile to use by default
+# build-profile = ...
+
+# Profile options for this project
+#    [profile]
+#    dev = { ocaml-flags = "-w +a-4-40-41-42-44" }
+#    release = { ocaml-flags = "-w -a" }
+[profile]
+# ...
+
+# project-wide fields (depends on project skeleton)
+[fields]
+dune-project-header = "(using menhir 2.1)"
+# ...
+
+[[package]]
+# Executable
+dir = "src/cli/"
+
+[[package]]
+dir = "src/ast/"
+
+[[package]]
+dir = "src/compiler/"
+
+[[package]]
+dir = "src/lex/"
+
+[[package]]
+dir = "src/typing/"

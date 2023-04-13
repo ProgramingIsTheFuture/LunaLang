@@ -1,0 +1,10 @@
+name = "lex"
+skeleton = "library"
+
+kind = "library"
+version = "version.ml"
+package = "ast"
+generators = ["ocamllex", "menhir"]
+
+[fields]
+dune-libraries = "ast"

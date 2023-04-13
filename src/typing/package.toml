@@ -1,0 +1,10 @@
+name = "typing"
+skeleton = "library"
+
+kind = "library"
+version = "version.ml"
+
+[dependencies]
+
+[fields]
+dune-libraries = "ast"

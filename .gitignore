@@ -1,1 +1,7 @@
 _build
+_opam
+_drom
+docs
+sphinx
+cli
+.vscode

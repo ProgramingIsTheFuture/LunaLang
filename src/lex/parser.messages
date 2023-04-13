@@ -1,0 +1,13 @@
+main: expr
+
+expr:
+  | op op
+
+op:
+  | ADD
+  | SUB
+  | DIV
+  | MUL
+  | MOD
+
+

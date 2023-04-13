@@ -1,0 +1,9 @@
+name = "ast"
+skeleton = "library"
+
+kind = "library"
+version = "version.ml"
+
+dune-stanzas = "(modules_without_implementation ast)(allow_empty)"
+
+[dependencies]

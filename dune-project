@@ -17,6 +17,7 @@
 
 (package
  (name cli)
+ (allow_empty)
  (synopsis "Compiler cli")
  (depends ocaml dune))
 
@@ -24,11 +25,6 @@
  (name ast)
  (synopsis "Abstract syntax tree")
  (depends ocaml dune))
-
-(package
- (name ast_test)
- (synopsis "Abstract syntax tree")
- (depends ocaml dune alcotest))
 
 (package
  (name lex)
@@ -44,3 +40,8 @@
  (name typing)
  (synopsis "Check the AST types")
  (depends ocaml dune ast))
+
+(package
+ (name luna_lang)
+ (synopsis "Compiler library")
+ (depends ocaml dune ast llvm))

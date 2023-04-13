@@ -1,0 +1,8 @@
+{1 Library luna_lang}
+
+Luna Lang is a programing language built with OCaml and llvm
+
+
+
+The entry point of this library is the module: {!Luna_lang}.
+

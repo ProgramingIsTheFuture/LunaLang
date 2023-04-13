@@ -1,5 +1,0 @@
-(executable
- (public_name cli)
- (name cli)
- (package cli)
- (libraries lex typing compiler cmdliner))

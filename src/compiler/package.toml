@@ -1,0 +1,11 @@
+name = "compiler"
+skeleton = "library"
+
+kind = "library"
+version = "version.ml"
+
+[dependencies]
+llvm = "14.0.6"
+
+[fields]
+dune-libraries = "ast"
