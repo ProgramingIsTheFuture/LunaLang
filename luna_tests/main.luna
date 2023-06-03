@@ -1,6 +1,8 @@
 
-let add a b =
-  a + b;
+let app a (f: int -> int) =
+  f a;
 
-add 0 1
+let f a =
+  a + 1;
 
+app 1 f

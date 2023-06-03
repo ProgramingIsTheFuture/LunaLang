@@ -1,10 +1,7 @@
 _build
 *.opam
 node_modules
-
 .obsidian
 */**/.obsidian
-
-*.s
-*.out
-*.ll
+*/**/.DS_Store
+.DS_Store
