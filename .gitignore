@@ -5,3 +5,7 @@ docs
 sphinx
 cli
 .vscode
+.obsidian
+*/**/.obsidian
+*/**/.DS_Store
+.DS_Store

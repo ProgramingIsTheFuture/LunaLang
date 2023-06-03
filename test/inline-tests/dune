@@ -6,4 +6,4 @@
   (pps ppx_inline_test))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries luna_lang ast compiler lex typing))
+ (libraries ast compiler lex typing))

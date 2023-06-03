@@ -6,5 +6,5 @@
   (pps ppx_expect))
  (inline_tests
   (modes best)) ; add js for testing with nodejs
- (libraries luna_lang ast compiler lex typing) ; add your project libraries here
+ (libraries ast compiler lex typing) ; add your project libraries here
  )

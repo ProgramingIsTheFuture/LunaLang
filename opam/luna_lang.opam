@@ -2,7 +2,7 @@
 # Do not modify, or add to the `skip` field of `drom.toml`.
 opam-version: "2.0"
 name: "luna_lang"
-version: "0.1.0"
+version: "version.ml"
 license: "LGPL-2.1-only WITH OCaml-LGPL-linking-exception"
 synopsis: "The Luna project"
 description: """\
@@ -34,6 +34,7 @@ install: [
 depends: [
   "ocaml" {>= "4.14.0"}
   "dune" {>= "2.7.0"}
+  "cmdliner" {>= "1.1.1" & < "2.0.0"}
   "ppx_inline_test" {with-test}
   "ppx_expect" {with-test}
   "odoc" {with-doc}

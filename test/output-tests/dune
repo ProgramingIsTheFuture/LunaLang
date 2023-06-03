@@ -19,7 +19,7 @@
 
 (executable
  (name test2)
- (libraries luna_lang ast compiler lex typing) ; add your own library here
+ (libraries ast compiler lex typing) ; add your own library here
  )
 
 (alias

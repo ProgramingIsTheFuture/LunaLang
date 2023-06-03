@@ -59,7 +59,7 @@ jobs:
 
       - run: opam pin add . -y --no-action
 
-      - run: opam depext -y luna_lang cli ast compiler lex typing
+      - run: opam depext -y luna_lang ast compiler lex typing
 #        if: steps.cache-opam.outputs.cache-hit != 'true'
 
       - run: opam install -y opam/*.opam --deps-only --with-test

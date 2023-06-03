@@ -3,6 +3,7 @@ skeleton = "library"
 
 kind = "library"
 version = "version.ml"
+pack-modules = true
 
 [dependencies]
 llvm = "14.0.6"

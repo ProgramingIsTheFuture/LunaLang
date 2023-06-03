@@ -1,0 +1,11 @@
+name = "luna_lang"
+skeleton = "program"
+
+kind = "program"
+version = "version.ml"
+
+[dependencies]
+cmdliner = "1.1.1"
+
+[fields]
+dune-libraries = "lex typing compiler"

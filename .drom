@@ -5,12 +5,12 @@ version:0.8.0
 
 # hash of toml configuration files
 # used for generation of all files
-4dbadc53399d2edd75986a5e2347156e:.
+47b8fc1b5a5375b62b86635f310419c7:.
 # end context for .
 
 # begin context for .github/workflows/workflow.yml
 # file .github/workflows/workflow.yml
-85057bf6130402538b92db3ec7333aa0:.github/workflows/workflow.yml
+f3192ede635a4af73e1b5b9ef372a83c:.github/workflows/workflow.yml
 # end context for .github/workflows/workflow.yml
 
 # begin context for .ocamlformat-ignore
@@ -25,7 +25,7 @@ c8f70450e7d78c0387644864ffe8cbd5:.ocamlformat-ignore
 
 # begin context for CHANGES.md
 # file CHANGES.md
-5bc094dcf92a63bebc527999f5f801ce:CHANGES.md
+d548e16ea780652599c798d31605d2a1:CHANGES.md
 # end context for CHANGES.md
 
 # begin context for Makefile
@@ -73,11 +73,6 @@ c8281f46ba9a11d0b61bc8ef67eaa357:docs/style.css
 ef4ec97eec9eaaa433ca548bdcbc01e4:opam/ast.opam
 # end context for opam/ast.opam
 
-# begin context for opam/cli.opam
-# file opam/cli.opam
-0ae2dfdd45a016b83ed89b4b08218d8d:opam/cli.opam
-# end context for opam/cli.opam
-
 # begin context for opam/compiler.opam
 # file opam/compiler.opam
 28a76eaae25e6f82d0ef707e9e682f09:opam/compiler.opam
@@ -90,7 +85,7 @@ e6fe8abf1d02098c141fd58c0b927022:opam/lex.opam
 
 # begin context for opam/luna_lang.opam
 # file opam/luna_lang.opam
-4d52e5385ad8bdcd13cf17180f173829:opam/luna_lang.opam
+2a1ad549b59f37a721125d1e74bca427:opam/luna_lang.opam
 # end context for opam/luna_lang.opam
 
 # begin context for opam/typing.opam
@@ -148,11 +143,6 @@ f5342ce399fa6a9c2b9bfd96d24ae3cc:sphinx/install.rst
 44d78a3333d5b5cf14049ccc57423046:src/ast/main.ml
 # end context for src/ast/main.ml
 
-# begin context for src/cli/dune
-# file src/cli/dune
-885737de44c4779b541dc10eee4bfc5a:src/cli/dune
-# end context for src/cli/dune
-
 # begin context for src/compiler/main.ml
 # file src/compiler/main.ml
 ba376c10c77751c14c0182948e17da48:src/compiler/main.ml
@@ -170,7 +160,7 @@ e40156ef44a7aeb62cce6b08607658d4:src/lex/dune
 
 # begin context for src/luna_lang/dune
 # file src/luna_lang/dune
-623f504f28921eac583b271b80b938f5:src/luna_lang/dune
+ce8e56f12818f38f37699a28e7447b9c:src/luna_lang/dune
 # end context for src/luna_lang/dune
 
 # begin context for src/luna_lang/index.mld
@@ -200,7 +190,7 @@ e8be2637088297175cf438b63178765a:src/typing/main.ml
 
 # begin context for test/expect-tests/dune
 # file test/expect-tests/dune
-008327153fed65ef216fce4196a8f0d7:test/expect-tests/dune
+6c4649d7bde5712c942d65d11deacbf9:test/expect-tests/dune
 # end context for test/expect-tests/dune
 
 # begin context for test/expect-tests/test.ml
@@ -210,7 +200,7 @@ e8be2637088297175cf438b63178765a:src/typing/main.ml
 
 # begin context for test/inline-tests/dune
 # file test/inline-tests/dune
-ad5f1bdf39d49dd7bf9a0b52eebcd938:test/inline-tests/dune
+be75a76c27da117aa629a9b67764a650:test/inline-tests/dune
 # end context for test/inline-tests/dune
 
 # begin context for test/inline-tests/test.ml
@@ -220,7 +210,7 @@ ad5f1bdf39d49dd7bf9a0b52eebcd938:test/inline-tests/dune
 
 # begin context for test/output-tests/dune
 # file test/output-tests/dune
-057659092430bfcdae2882d4ef00b600:test/output-tests/dune
+5b223d7e953a926b9b425e801e40e9de:test/output-tests/dune
 # end context for test/output-tests/dune
 
 # begin context for test/output-tests/test1.expected

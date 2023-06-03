@@ -28,7 +28,7 @@ bug-reports = "https://github.com/ProgramingIsTheFuture/LunaLang/issues"
 description = """
 Luna Lang is a programing language built with OCaml and llvm
 """
-skip = []
+skip = ["src/compiler/main.ml", "src/lex/main.ml", "src/typing/main.ml", "src/ast/main.ml"]
 # dirs to skip while scanning for dune files
 skip-dirs = ["luna_tests"]
 # dirs to scan for share/ folders (with package names)
@@ -64,8 +64,7 @@ dune-project-header = "(using menhir 2.1)"
 # ...
 
 [[package]]
-# Executable
-dir = "src/cli/"
+dir = "src/luna_lang/"
 
 [[package]]
 dir = "src/ast/"
