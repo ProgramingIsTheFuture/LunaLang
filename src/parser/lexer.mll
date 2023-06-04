@@ -21,14 +21,20 @@ let digit = ['0'-'9']
 let id = ['a'-'z' 'A'-'Z']['a'-'z' '0'-'9']*
 
 rule token = parse
+  | ['\n' '\t' ' '] { token lexbuf }
   | '=' { EQUAL }
+  | ':' { DOUBLEDOT }
+  | '(' { LPARENT }
+  | ')' { RPARENT }
   | "->" { ARROW }
-  | digit* as integer { VALUE (Vint (int_of_string integer)) }
+  | "()" { UNIT }
+  | digit+ as integer { VALUE (Vint (int_of_string integer)) }
   | "true" {VALUE (Vbool (true))}
   | "false" {VALUE (Vbool (false))}
   | '"' _* as text '"' { VALUE (Vstr (text)) }
   | id as word 
     {
-      try Hashtbl.find keyword_table word with Not_found -> NAME word
+      try Hashtbl.find keyword_table word with Not_found -> IDENT word
     }
+  | eof {EOF}
   | _ as c { failwith (Format.sprintf "Unknown char %c\n" c) }
