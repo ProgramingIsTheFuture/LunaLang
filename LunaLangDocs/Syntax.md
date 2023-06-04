@@ -1,24 +1,29 @@
 
-```c
-add(a, b) {
-	a + b
-}
+```ebnf
+<name> ::= words
 
-main() {
-	let a = 10;
-	let a: int = 10;
-}
+<typnames> ::= Words
+
+<typ> ::=
+	| <int>
+	| <string>
+	| <product> (AxB)
+	| <bool>
+
+<sumtypes> ::=
+	| type <name> = <typnames> [of <typ>] | <typnames>
+
+<bool> ::= true | false
+
+<const> ::= 
+	| n as number
+	| s as string
+	| <bool>
+
+<expression> ::=
+	| <const>
+	| let <name> = <expression> in <expression>
+	| fun <name> -> <expression>
+	| if <bool> then <expression> else <expression>
+
 ```
-
-```c
-int add2(int a, int b) {
-	return a + b;	
-}
-
-void main() {
-	let a: int = 10;
-	add2(15, a);
-}
-```
-
-# Big idea.
