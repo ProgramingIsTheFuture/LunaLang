@@ -3,6 +3,4 @@ let app a (f: int -> int) =
   f a;
 
 let f a =
-  a + 1;
-
-app 1 f
+  a;
