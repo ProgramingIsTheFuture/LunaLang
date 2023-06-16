@@ -24,6 +24,7 @@ rule token = parse
   | ['\n' '\t' ' '] { token lexbuf }
   | '=' { EQUAL }
   | ':' { DOUBLEDOT }
+  | ';' { SEMICOLON }
   | '(' { LPARENT }
   | ')' { RPARENT }
   | "->" { ARROW }

@@ -16,6 +16,7 @@
 %token EQUAL "=" 
 %token ARROW "->" 
 %token DOUBLEDOT ":" 
+%token SEMICOLON ";" 
 %token LPARENT "(" 
 %token RPARENT ")" 
 %token UNIT "()" 
@@ -31,13 +32,18 @@ main:
     { $1 }
 
 expr_t:
+  | "let" name = IDENT t = typs? "=" e1 = expr_t ";"
+    { 
+      { expr = LetIn (name, t, e1, None); pos = position ($startofs($1), $endofs($6)) }
+    }
+  | e = syntatic_sugar_let
   | e = expr
-   { {expr = e; pos = position ($startofs(e), $endofs(e))} }
+  | "(" e = expr ")"
+    { {expr = e; pos = position ($startofs(e), $endofs(e))} }
 
 expr:
-  | "(" e = expr ")" { e }
-  | "let" name = IDENT t = typs? "=" e1 = expr_t e2 = let_in_op?
-    { LetIn (name, t, e1, e2) }
+  | "let" name = IDENT t = typs? "=" e1 = expr_t e2 = let_in_op
+    { LetIn (name, t, e1, Some e2) }
   | "fun" n = IDENT t = typs? "->" e1 = expr_t
     { Fun (n, t, e1) }
   | "if" e1 = expr_t "then" e2 = expr_t "else" e3 = expr_t
@@ -74,6 +80,16 @@ var_typs:
   | n = IDENT t = typs?
     { n, t }
 
+syntatic_sugar_let:
+  | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t ";"
+    { 
+      let rec list_to_fun = function
+        | [] -> e1
+        | (a, t) :: tl ->
+            {expr = Fun (a, t, list_to_fun tl); pos = position ($startofs(e1), $endofs(e1))}
+      in
+      LetIn (name, t, list_to_fun vt, None)
+    }
 
 syntatic_sugar:
   | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t e2 = let_in_op?
