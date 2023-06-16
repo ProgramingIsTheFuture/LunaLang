@@ -1,0 +1,6 @@
+(library
+ (name type_checker_test)
+ (libraries parser type_checker)
+ (inline_tests)
+ (preprocess
+  (pps ppx_expect ppx_inline_test)))
