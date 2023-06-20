@@ -64,14 +64,14 @@ let rec fvars t =
 (*
    bindings - Variables inside the real context GAMA
    fvars - free variables *)
-type t = { bindings : schema HashMap.t; fvars : VSet.t }
+type t = { bindings : schema HashMap.t; fvars : VSet.t; runtime : Runtime.t }
 
-let empty = { bindings = bindings_empty; fvars = VSet.empty }
+let empty r = { bindings = bindings_empty; fvars = VSet.empty; runtime = r }
 
 let add name (t : typ) env =
   let vt = fvars t in
   let s, fvars = ({ typ = t; vars = VSet.empty }, VSet.union env.fvars vt) in
-  { bindings = bindings_add name s env.bindings; fvars }
+  { bindings = bindings_add name s env.bindings; fvars; runtime = env.runtime }
 
 let add_gen name (t : typ) env =
   let vt = fvars t in
@@ -81,10 +81,14 @@ let add_gen name (t : typ) env =
     in
     ({ typ = t; vars = VSet.diff vt env_fvars }, env.fvars)
   in
-  { bindings = bindings_add name s env.bindings; fvars }
+  { bindings = bindings_add name s env.bindings; fvars; runtime = env.runtime }
 
 let find name env =
-  let tx = bindings_find name env.bindings in
+  let tx =
+    try bindings_find name env.bindings
+    with Not_found ->
+      { typ = Runtime.find name env.runtime; vars = VSet.empty }
+  in
   let s =
     VSet.fold (fun v s -> VMap.add v (Tvar (V.create ())) s) tx.vars VMap.empty
   in
