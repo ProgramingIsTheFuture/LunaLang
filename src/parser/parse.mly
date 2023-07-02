@@ -28,22 +28,32 @@
 %%
 
 main:
-  | list(expr_t) EOF
+  | list(t) EOF
     { $1 }
 
-expr_t:
-  | "let" name = IDENT t = typs? "=" e1 = expr_t ";"
-    { 
-      { expr = LetIn (name, t, e1, None); pos = position ($startofs($1), $endofs($6)) }
+t:
+  | "let" name = IDENT t = typs? "=" e1 = expr_t ";"?
+    {
+      Let { name; expr = e1; pos = position ($startofs($1), $endofs($6)); typ = t }
     }
-  | e = syntatic_sugar_let
+  | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t ";"?
+    { 
+      let rec list_to_fun = function
+        | [] -> e1
+        | (a, t) :: tl ->
+            {expr = Fun (a, t, list_to_fun tl); pos = position ($startofs(e1), $endofs(e1))}
+      in
+      Let { name; expr = list_to_fun vt; pos = position ($startofs($1), $endofs($7)); typ = t }
+    }
+
+expr_t:
   | e = expr
   | "(" e = expr ")"
     { {expr = e; pos = position ($startofs(e), $endofs(e))} }
 
 expr:
   | "let" name = IDENT t = typs? "=" e1 = expr_t e2 = let_in_op
-    { LetIn (name, t, e1, Some e2) }
+    { LetIn (name, t, e1, e2) }
   | "fun" n = IDENT t = typs? "->" e1 = expr_t
     { Fun (n, t, e1) }
   | "if" e1 = expr_t "then" e2 = expr_t "else" e3 = expr_t
@@ -69,7 +79,7 @@ var_or_app:
 typs:
   | ":" n = separated_list("->", IDENT)
     {
-      String.concat "->" n 
+      String.concat " -> " n 
     }
 
 let_in_op:
@@ -77,22 +87,13 @@ let_in_op:
     { e2 }
 
 var_typs:
-  | n = IDENT t = typs?
+
+  | n = IDENT { n, None }
+  | "(" n = IDENT t = typs? ")"
     { n, t }
 
-syntatic_sugar_let:
-  | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t ";"
-    { 
-      let rec list_to_fun = function
-        | [] -> e1
-        | (a, t) :: tl ->
-            {expr = Fun (a, t, list_to_fun tl); pos = position ($startofs(e1), $endofs(e1))}
-      in
-      LetIn (name, t, list_to_fun vt, None)
-    }
-
 syntatic_sugar:
-  | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t e2 = let_in_op?
+  | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t e2 = let_in_op
     { 
       let rec list_to_fun = function
         | [] -> e1

@@ -18,7 +18,7 @@
 }
 
 let digit = ['0'-'9']
-let id = ['a'-'z' 'A'-'Z']['a'-'z' '0'-'9']*
+let id = ['_' 'a'-'z' 'A'-'Z']['_' 'a'-'z' '0'-'9']*
 
 rule token = parse
   | ['\n' '\t' ' '] { token lexbuf }
