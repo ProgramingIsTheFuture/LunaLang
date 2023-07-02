@@ -23,7 +23,7 @@ jobs:
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v2
         with:
-          ocaml-compiler: 4.12.0
+          ocaml-compiler: 4.14.0
           
       - name: conf-python
         run: |
@@ -34,15 +34,8 @@ jobs:
         run: opam install . --deps-only --with-doc
         shell: bash
       
-      - name: Build docs
+      - name: Run tests 
         run: |
           rm *.opam
           opam exec -- dune build
-          opam exec -- dune build @doc
-        shell: bash
-        
-      - name: Deploy odoc to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:         
-          github_token: ${{ github.token }}
-          publish_dir: _build/default/_doc/_html
+          opam exec -- dune runtest
