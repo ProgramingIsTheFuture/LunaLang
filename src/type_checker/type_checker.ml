@@ -52,9 +52,7 @@ let rec type_expr env : Ast.Parsing.expr -> Env.t * Ast.Typed.expr = function
       try
         let t = Env.find s env in
         (env, { expr = Var s; pos; typ = t })
-      with _ ->
-        Format.printf "Not Found! %s@?" s;
-        failwith "No var Found")
+      with _ -> Errors.unbound_variable s pos)
   | { expr = Const v; pos } ->
       (env, { expr = Const v; pos; typ = typ_of_value v })
   | { expr = IfThen (b, e1, e2); pos } ->

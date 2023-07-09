@@ -38,4 +38,4 @@ rule token = parse
       try Hashtbl.find keyword_table word with Not_found -> IDENT word
     }
   | eof {EOF}
-  | _ as c { failwith (Format.sprintf "Unknown char %c\n" c) }
+  | _ as c { Errors.lexing_error lexbuf c }

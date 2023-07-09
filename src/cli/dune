@@ -1,2 +1,3 @@
 (executables
- (names cli))
+ (names cli)
+ (libraries cmdliner parser type_checker runtime))

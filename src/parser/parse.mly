@@ -1,9 +1,7 @@
 %{ 
   open Ast.Parsing
+  open Errors
 
-  let position (starts, ends) = 
-    let open Ast.Common in
-    {starts; ends }
 %}
 
 %token EOF
@@ -34,22 +32,22 @@ main:
 t:
   | "let" name = IDENT t = typs? "=" e1 = expr_t ";"?
     {
-      Let { name; expr = e1; pos = position ($startofs($1), $endofs($6)); typ = t }
+      Let { name; expr = e1; pos = position ($loc($1), $loc($6)); typ = t }
     }
   | "let" name = IDENT vt = var_typs+ t = typs? "=" e1 = expr_t ";"?
     { 
       let rec list_to_fun = function
         | [] -> e1
         | (a, t) :: tl ->
-            {expr = Fun (a, t, list_to_fun tl); pos = position ($startofs(e1), $endofs(e1))}
+            {expr = Fun (a, t, list_to_fun tl); pos = position ($loc(e1), $loc(e1))}
       in
-      Let { name; expr = list_to_fun vt; pos = position ($startofs($1), $endofs($7)); typ = t }
+      Let { name; expr = list_to_fun vt; pos = position ($loc($1), $loc($7)); typ = t }
     }
 
 expr_t:
   | e = expr
   | "(" e = expr ")"
-    { {expr = e; pos = position ($startofs(e), $endofs(e))} }
+    { {expr = e; pos = position ($loc(e), $loc(e))} }
 
 expr:
   | "let" name = IDENT t = typs? "=" e1 = expr_t e2 = let_in_op
@@ -69,12 +67,12 @@ var_or_app:
     { 
       match e2 with
       | Some e2 ->
-        App ({expr = Var n; pos = position ($startofs(n), $endofs(n))}, e2) 
+        App ({expr = Var n; pos = position ($loc(n), $loc(n))}, e2) 
       | None ->
         Var n
     }
   | e1 = expr e2 = expr
-    { App ({expr = e1; pos = position ($startofs(e1), $endofs(e1))}, {expr = e2; pos = position ($startofs(e2), $endofs(e2))}) }
+    { App ({expr = e1; pos = position ($loc(e1), $loc(e1))}, {expr = e2; pos = position ($loc(e2), $loc(e2))}) }
 
 typs:
   | ":" n = separated_list("->", IDENT)
@@ -98,7 +96,7 @@ syntatic_sugar:
       let rec list_to_fun = function
         | [] -> e1
         | (a, t) :: tl ->
-            {expr = Fun (a, t, list_to_fun tl); pos = position ($startofs(e1), $endofs(e1))}
+            {expr = Fun (a, t, list_to_fun tl); pos = position ($loc(e1), $loc(e1))}
       in
       LetIn (name, t, list_to_fun vt, e2) 
     }
