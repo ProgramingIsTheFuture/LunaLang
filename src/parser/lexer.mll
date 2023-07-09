@@ -15,13 +15,20 @@
       ("let", LET);
       ("in", IN);
     ]
+
+  let next_line (lexbuf: Lexing.lexbuf) =
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_p <-
+      { pos with pos_bol = lexbuf.lex_curr_pos;
+                 pos_lnum = pos.pos_lnum + 1
+      }
 }
 
 let digit = ['0'-'9']
 let id = ['_' 'a'-'z' 'A'-'Z']['_' 'a'-'z' '0'-'9']*
 
 rule token = parse
-  | ['\n' '\t' ' '] { token lexbuf }
+  | ['\n' '\t' ' '] { next_line lexbuf; token lexbuf }
   | '=' { EQUAL }
   | ':' { DOUBLEDOT }
   | ';' { SEMICOLON }
