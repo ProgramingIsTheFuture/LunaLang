@@ -6,7 +6,8 @@ let type_it s =
   try
     Parser.of_file s |> Parser.parse
     |> Type_checker.type_ast ~env:(Type_checker.Env.empty Runtime.default)
-    |> ignore
+    |> Compiler.compile ~runtime:Runtime.default
+    |> print_string |> print_newline
   with
   | Parser.Errors.LexingError s ->
       Format.printf "Lexing Error.\n%s\n" s;
