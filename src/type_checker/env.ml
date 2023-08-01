@@ -37,7 +37,6 @@ let rec unify ~pos t1 t2 : unit =
       unify ~pos t11 t21;
       unify ~pos t12 t22
   | Tarrow (t1, _), t2 -> unify ~pos t1 t2
-  | t1, Tarrow (t2, _) -> unify ~pos t1 t2
   | t1, t2 when t1 = t2 -> ()
   | t1, t2 -> Errors.type_error (canon t1) (canon t2) pos
 

@@ -36,6 +36,24 @@ let%expect_test "let" =
     let f : 'a -> 'a = [typ 'a -> 'a](fun (a) -> ([typ 'a]a))
     ;let b : int = [typ int](([typ int -> int]f) ([typ int]10));let c : bool = [typ bool](([typ bool -> bool]f) ([typ bool]false)); |}]
 
+let%test "wrong_application" =
+  let parsed = Parser.of_string "let _ = 1 2" |> Parser.parse in
+  (* |> List.iter (fun a -> Ast.Parsing.pp_t a |> print_string |> flush_all); *)
+  match
+    Type_checker.type_ast ~env:(Type_checker.Env.empty Runtime.empty) parsed
+  with
+  | exception Type_checker.Errors.TypeError _ -> true
+  | (exception _) | _ -> false
+
+let%test "wrong_application2" =
+  let parsed = Parser.of_string "let f a = a; let _ = 1 f" |> Parser.parse in
+  (* |> List.iter (fun a -> Ast.Parsing.pp_t a |> print_string |> flush_all); *)
+  match
+    Type_checker.type_ast ~env:(Type_checker.Env.empty Runtime.empty) parsed
+  with
+  | exception Type_checker.Errors.TypeError _ -> true
+  | (exception _) | _ -> false
+
 let%expect_test "runtime" =
   Parser.of_string "let _ = printint 15"
   |> Parser.parse
