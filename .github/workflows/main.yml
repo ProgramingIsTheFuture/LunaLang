@@ -17,11 +17,6 @@ jobs:
       
       - name: Install Package
         uses: ConorMacBride/install-package@v1.1.0
-        with:
-          brew: llvm@11 python@3.11
-        
-      - name: Alias
-        run: alias python="python3"
 
       - name: Use OCaml
         uses: ocaml/setup-ocaml@v2
